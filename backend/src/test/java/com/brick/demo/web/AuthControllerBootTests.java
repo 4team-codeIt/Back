@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.brick.demo.auth.controller.AuthController;
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
+import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountManager;
@@ -101,13 +102,17 @@ public class AuthControllerBootTests {
   }
 
   @Test
-  public void checkEmailDuplicate() throws Exception {
+  public void emailDuplicate() throws Exception {
     DuplicateEmailRequestDto duplicateEmailRequestDto = DuplicateEmailRequestDto.builder()
         .email("hoho@email.com")
         .build();
+    DuplicateEmailResponseDto duplicateEmailResponseDto = DuplicateEmailResponseDto.builder()
+        .duplicateEmail(true)
+        .build();
 
-    // 이메일이 중복된 경우
-    given(authService.isExistedEmail(any(DuplicateEmailRequestDto.class))).willReturn(true);
+//    // 이메일이 중복된 경우
+    given(authService.isDuplicatedEmail(any(DuplicateEmailRequestDto.class))).willReturn(
+        duplicateEmailResponseDto);
 
     mockMvc.perform(post("/auth/users/duplicate-email").
             contentType(MediaType.APPLICATION_JSON)
@@ -116,10 +121,21 @@ public class AuthControllerBootTests {
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("duplicateEmail").value(true));
-    verify(authService).isExistedEmail(any(DuplicateEmailRequestDto.class));
+    verify(authService).isDuplicatedEmail(any(DuplicateEmailRequestDto.class));
+  }
+
+  @Test
+  public void emailNotDuplicate() throws Exception {
+    DuplicateEmailRequestDto duplicateEmailRequestDto = DuplicateEmailRequestDto.builder()
+        .email("hoho@email.com")
+        .build();
+    DuplicateEmailResponseDto duplicateEmailResponseDto = DuplicateEmailResponseDto.builder()
+        .duplicateEmail(false)
+        .build();
 
     // 이메일이 중복되지 않은 경우
-    given(authService.isExistedEmail(any(DuplicateEmailRequestDto.class))).willReturn(false);
+    given(authService.isDuplicatedEmail(any(DuplicateEmailRequestDto.class))).willReturn(
+        duplicateEmailResponseDto);
 
     mockMvc.perform(post("/auth/users/duplicate-email").
             contentType(MediaType.APPLICATION_JSON)
@@ -128,8 +144,6 @@ public class AuthControllerBootTests {
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("duplicateEmail").value(false));
-    verify(authService, times(2)).isExistedEmail(any(DuplicateEmailRequestDto.class));
+    verify(authService, times(2)).isDuplicatedEmail(any(DuplicateEmailRequestDto.class));
   }
-
-
 }

@@ -1,6 +1,7 @@
 package com.brick.demo.auth.service;
 
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
+import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountManager;
@@ -30,8 +31,12 @@ public class AuthService {
   }
 
   @Transactional(readOnly = true)
-  public boolean isExistedEmail(DuplicateEmailRequestDto dto) {
-    return accountManager.getAccountByEmail(dto.getEmail()) != null;
+  public DuplicateEmailResponseDto isDuplicatedEmail(DuplicateEmailRequestDto dto) {
+    boolean isDuplicate = accountManager.getAccountByEmail(dto.getEmail()) != null;
+    DuplicateEmailResponseDto response = DuplicateEmailResponseDto.builder().
+        duplicateEmail(isDuplicate).
+        build();
+    return response;
   }
 
   public void createAccount(SignUpRequestDto dto) {
