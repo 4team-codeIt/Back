@@ -3,7 +3,7 @@ server:
 
 spring:
   config:
-    import: classpath:application-db.yml
+    import: classpath:application-private.yml
 
   banner:
     location: banner-local.txt
@@ -33,3 +33,6 @@ spring:
           type:
             descriptor:
               sql: trace
+
+jwt:
+  secret: ${local-jwt.secret}

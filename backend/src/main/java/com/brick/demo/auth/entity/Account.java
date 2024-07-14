@@ -2,6 +2,7 @@ package com.brick.demo.auth.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -16,11 +17,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "account")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Account {
 
   @Id
@@ -36,7 +39,7 @@ public class Account {
   private String email;
 
   @NotEmpty(message = "Password is required")
-  @Column(length = 20, nullable = false)
+  @Column(length = 60, nullable = false)
   private String password;
 
   @Enumerated(EnumType.STRING)
