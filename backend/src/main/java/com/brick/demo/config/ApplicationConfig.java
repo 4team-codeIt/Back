@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@EntityScan("auth.entity")
+@EntityScan(basePackages = "com.brick.demo.auth.entity")
 @EnableTransactionManagement
 public class ApplicationConfig {
 
