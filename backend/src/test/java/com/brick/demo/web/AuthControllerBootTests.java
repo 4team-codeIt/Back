@@ -3,7 +3,6 @@ package com.brick.demo.web;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -103,12 +102,9 @@ public class AuthControllerBootTests {
 
   @Test
   public void emailDuplicate() throws Exception {
-    DuplicateEmailRequestDto duplicateEmailRequestDto = DuplicateEmailRequestDto.builder()
-        .email("hoho@email.com")
-        .build();
-    DuplicateEmailResponseDto duplicateEmailResponseDto = DuplicateEmailResponseDto.builder()
-        .duplicateEmail(true)
-        .build();
+    DuplicateEmailRequestDto duplicateEmailRequestDto = new DuplicateEmailRequestDto(
+        "hoho@email.com");
+    DuplicateEmailResponseDto duplicateEmailResponseDto = new DuplicateEmailResponseDto(true);
 
 //    // 이메일이 중복된 경우
     given(authService.isDuplicatedEmail(any(DuplicateEmailRequestDto.class))).willReturn(
@@ -126,12 +122,9 @@ public class AuthControllerBootTests {
 
   @Test
   public void emailNotDuplicate() throws Exception {
-    DuplicateEmailRequestDto duplicateEmailRequestDto = DuplicateEmailRequestDto.builder()
-        .email("hoho@email.com")
-        .build();
-    DuplicateEmailResponseDto duplicateEmailResponseDto = DuplicateEmailResponseDto.builder()
-        .duplicateEmail(false)
-        .build();
+    DuplicateEmailRequestDto duplicateEmailRequestDto = new DuplicateEmailRequestDto(
+        "hoho@email.com");
+    DuplicateEmailResponseDto duplicateEmailResponseDto = new DuplicateEmailResponseDto(false);
 
     // 이메일이 중복되지 않은 경우
     given(authService.isDuplicatedEmail(any(DuplicateEmailRequestDto.class))).willReturn(
@@ -144,6 +137,6 @@ public class AuthControllerBootTests {
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("duplicateEmail").value(false));
-    verify(authService, times(2)).isDuplicatedEmail(any(DuplicateEmailRequestDto.class));
+    verify(authService).isDuplicatedEmail(any(DuplicateEmailRequestDto.class));
   }
 }

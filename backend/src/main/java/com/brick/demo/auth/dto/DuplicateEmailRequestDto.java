@@ -3,7 +3,6 @@ package com.brick.demo.auth.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,8 +14,7 @@ public class DuplicateEmailRequestDto {
   @NotEmpty
   private String email;
 
-  @Builder
-  DuplicateEmailRequestDto(String email) {
+  public DuplicateEmailRequestDto(String email) {
     this.email = email;
   }
 }

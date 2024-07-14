@@ -33,9 +33,7 @@ public class AuthService {
   @Transactional(readOnly = true)
   public DuplicateEmailResponseDto isDuplicatedEmail(DuplicateEmailRequestDto dto) {
     boolean isDuplicate = accountManager.getAccountByEmail(dto.getEmail()) != null;
-    DuplicateEmailResponseDto response = DuplicateEmailResponseDto.builder().
-        duplicateEmail(isDuplicate).
-        build();
+    DuplicateEmailResponseDto response = new DuplicateEmailResponseDto(isDuplicate);
     return response;
   }
 
