@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: demo
+  profiles:
+    default: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local, prod
