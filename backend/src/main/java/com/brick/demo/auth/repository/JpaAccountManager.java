@@ -4,6 +4,7 @@ import com.brick.demo.auth.entity.Account;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
+import java.util.Optional;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +21,13 @@ public class JpaAccountManager extends AbstractAccountManager {
   }
 
   @Override
-  public Account getAccountByEmail(String email) {
+  public Optional<Account> getAccountByEmail(String email) {
     try {
-      return entityManager.createQuery("SELECT a FROM Account a WHERE a.email = :email",
+      Account account = entityManager.createQuery("SELECT a FROM Account a WHERE a.email = :email",
               Account.class)
           .setParameter("email", email)
           .getSingleResult();
+      return Optional.of(account);
     } catch (NoResultException e) {
       return null; // 계정을 찾지 못한 경우 null을 반환
     }

@@ -1,47 +1,71 @@
 package com.brick.demo.auth.service;
 
+import static com.brick.demo.auth.jwt.JwtRequestFilter.BEARER_PREFIX;
+
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
+import com.brick.demo.auth.dto.TokenDto;
+import com.brick.demo.auth.dto.UserResponseDto;
 import com.brick.demo.auth.entity.Account;
+import com.brick.demo.auth.jwt.AccessToken;
+import com.brick.demo.auth.jwt.RefreshToken;
+import com.brick.demo.auth.jwt.TokenProvider;
 import com.brick.demo.auth.repository.AccountManager;
+import com.brick.demo.auth.repository.TokenManager;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
-public class AuthService implements UserDetailsService {
+public class AuthService {
 
-  private static final String COOKIE_NAME = "email";
   private final AccountManager accountManager;
   private final PasswordEncoder passwordEncoder;
+  private final AuthenticationManagerBuilder authenticationManagerBuilder;
+  private final TokenProvider tokenProvider;
+  private final TokenManager<RefreshToken> refreshTokenManager;
+  private final TokenManager accessTokenTokenManager;
 
   @Autowired
-  public AuthService(AccountManager accountManager, PasswordEncoder passwordEncoder) {
+  public AuthService(AccountManager accountManager, PasswordEncoder passwordEncoder,
+      AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider,
+      TokenManager<RefreshToken> refreshTokenManager,
+      @Qualifier("accessTokenTokenManager") TokenManager accessTokenTokenManager) {
     this.accountManager = accountManager;
     this.passwordEncoder = passwordEncoder;
+    this.authenticationManagerBuilder = authenticationManagerBuilder;
+    this.tokenProvider = tokenProvider;
+    this.refreshTokenManager = refreshTokenManager;
+    this.accessTokenTokenManager = accessTokenTokenManager;
   }
 
   @Transactional(readOnly = true)
-  public Account findAccountByEmail(HttpServletRequest request) throws CustomException {
-    String email = extractEmailFromCookie(request);
-    Account account = accountManager.getAccountByEmail(email);
-    if (account == null) {
-      throw new CustomException(ErrorDetails.USER_NOT_FOUND_BY_EMAIL);
+  public Optional<UserResponseDto> getAccountDetail(String authorizationHeader) {
+    if (authorizationHeader.startsWith(BEARER_PREFIX)) {
+      String accessToken = authorizationHeader.substring(BEARER_PREFIX.length());
+      Authentication authentication = tokenProvider.getAuthentication(accessToken);
+      String email = authentication.getName();
+      Optional<Account> account = accountManager.getAccountByEmail(email);
+      if (account != null) {
+        return Optional.of(new UserResponseDto(account.get().getEmail(), account.get().getName()));
+      }
+      throw new CustomException(ErrorDetails.E001);
     }
-    return account;
+    throw new CustomException(ErrorDetails.E003);
   }
 
   @Transactional(readOnly = true)
@@ -53,73 +77,53 @@ public class AuthService implements UserDetailsService {
 
   public void createAccount(SignUpRequestDto dto) {
     String encodedPassword = passwordEncoder.encode(dto.getPassword());
-    Account account = Account.builder()
-        .name(dto.getName())
-        .email(dto.getEmail())
-        .password(encodedPassword)
-        .build();
+    Account account = dto.toEntity(passwordEncoder);
     accountManager.save(account);
   }
 
-  public SigninResponseDto signin(SigninRequestDto dto, HttpServletResponse response) {
-    authenticate(dto);
+  public SigninResponseDto signin(SigninRequestDto dto) {
+    UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
 
-    // 이메일을 쿠키에 저장
-    Cookie cookie = new Cookie(COOKIE_NAME, dto.getEmail());
-    cookie.setHttpOnly(true);
-    cookie.setPath("/"); // 애플리케이션 전체에서 유효
-    cookie.setMaxAge(10 * 60 * 60); // 쿠키의 유효 기간 설정 (초 단위)
-    response.addCookie(cookie);
+    Authentication authentication = authenticationManagerBuilder.getObject()
+        .authenticate(
+            authenticationToken); //authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 실행됨.
 
-    return new SigninResponseDto(dto.getEmail());
-  }
-
-  public ResponseEntity<Void> signout(HttpServletResponse response) {
-    // 이메일 쿠키를 무효화
-    Cookie cookie = new Cookie(COOKIE_NAME, null);
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(0); // 쿠키를 즉시 삭제
-
-    response.addCookie(cookie);
-
-    return ResponseEntity.ok().build();
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String email) {
-    return loadUserByEmail(email);
-  }
-
-  public UserDetails loadUserByEmail(String email) {
-    Account account = accountManager.getAccountByEmail(email);
-    if (account == null) {
-      throw new CustomException(ErrorDetails.INVALID_CREDENTIALS);
+    //이미 로그인 했었는지 검사(재로그인, 토큰 재발급 방지)
+    Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
+    if (existingAccessToken.isPresent()) {
+      throw new CustomException(ErrorDetails.E004);
     }
 
-    return User.builder()
-        .username(account.getEmail())
-        .password(account.getPassword())
-        .build();
+    TokenDto tokenDto = tokenProvider.generateToken(authentication);
+    AccessToken accessToken = new AccessToken(authentication.getName(),
+        tokenDto.getAccessToken());
+    accessTokenTokenManager.save(accessToken);
+    RefreshToken refreshToken = new RefreshToken(authentication.getName(),
+        tokenDto.getRefreshToken());
+    refreshTokenManager.save(refreshToken);
+
+    return new SigninResponseDto(tokenDto.getGrantType(), tokenDto.getAccessToken(),
+        tokenDto.getAccessTokenExpiresIn());
   }
 
-  private void authenticate(SigninRequestDto dto) {
-    UserDetails userDetails = loadUserByEmail(dto.getEmail());
-    if (!passwordEncoder.matches(dto.getPassword(), userDetails.getPassword())) {
-      throw new CustomException(ErrorDetails.INVALID_CREDENTIALS);
-    }
-  }
+  public ResponseEntity<Void> signout(String authorizationHeader) {
+    //TODO: access token, refresh token에 expired time을 추가해서 만료하는 방식으로 수정해야함
+    if (authorizationHeader.startsWith(BEARER_PREFIX)) {
+      String accessToken = authorizationHeader.substring(BEARER_PREFIX.length());
+      Authentication authentication = tokenProvider.getAuthentication(accessToken);
+      String email = authentication.getName();
 
-  private String extractEmailFromCookie(HttpServletRequest request) throws CustomException {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if (COOKIE_NAME.equals(cookie.getName())) {
-          return cookie.getValue();
-        }
+      //이미 로그아웃 했었는지 검사(재로그인, 토큰 재발급 방지)
+      Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(email);
+      if (existingAccessToken.isEmpty()) {
+        throw new CustomException(ErrorDetails.E005);
       }
+
+      accessTokenTokenManager.deleteByKey(email);
+      refreshTokenManager.deleteByKey(email);
+      return ResponseEntity.ok().build();
     }
-    throw new CustomException(ErrorDetails.INVALID_CREDENTIALS);
+    throw new CustomException(ErrorDetails.E003);
+
   }
 }

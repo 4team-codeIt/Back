@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,10 +30,10 @@ public class SignUpRequestDto {
     this.name = name;
   }
 
-  public Account toEntity() {
+  public Account toEntity(PasswordEncoder passwordEncoder) {
     return Account.builder()
         .email(this.email)
-        .password(this.password)
+        .password(passwordEncoder.encode(this.password))
         .name(this.name)
         .build();
   }

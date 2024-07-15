@@ -5,11 +5,10 @@ import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
-import com.brick.demo.auth.entity.Account;
+import com.brick.demo.auth.dto.UserResponseDto;
 import com.brick.demo.auth.service.AuthService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +38,9 @@ public class AuthController {
   }
 
   @GetMapping(value = "/user")
-  public Account accountDetails(HttpServletRequest request) {
-    return authService.findAccountByEmail(request);
+  public Optional<UserResponseDto> accountDetails(
+      @RequestHeader("Authorization") String authorizationHeader) {
+    return authService.getAccountDetail(authorizationHeader);
   }
 
   @PostMapping("/signup")
@@ -50,14 +51,20 @@ public class AuthController {
 
   @PostMapping("/signin")
   public SigninResponseDto createAuthenticationToken(
-      @RequestBody SigninRequestDto dto, HttpServletResponse response) {
-    return authService.signin(dto, response);
+      @RequestBody SigninRequestDto dto) {
+    return authService.signin(dto);
   }
 
-  @PostMapping("/signout")
-  public ResponseEntity<Void> logout(HttpServletResponse response) {
-    return authService.signout(response);
+  @GetMapping("/signout")
+  public ResponseEntity<Void> signout(
+      @RequestHeader("Authorization") String authorizationHeader) {
+    return authService.signout(authorizationHeader);
   }
+
+//  @PostMapping("/reissue")
+//  public ResponseEntity<TokenDto> reissue(@RequestBody TokenRequestDto tokenRequestDto) {
+//    return ResponseEntity.ok(authService.reissue(tokenRequestDto));
+//  }
 
   @PostMapping("/users/duplicate-email")
   public DuplicateEmailResponseDto duplicateEmail(

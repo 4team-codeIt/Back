@@ -6,10 +6,14 @@ import lombok.Getter;
 @Getter
 public class SigninResponseDto {
 
-  private final String token;
+  private final String grantType;
+  private final String accessToken;
+  private final Long accessTokenExpiresIn;
 
   @JsonCreator
-  public SigninResponseDto(String token) {
-    this.token = token;
+  public SigninResponseDto(String grantType, String accessToken, Long accessTokenExpiresIn) {
+    this.grantType = grantType;
+    this.accessToken = accessToken;
+    this.accessTokenExpiresIn = accessTokenExpiresIn;
   }
 }

@@ -1,19 +1,20 @@
 package com.brick.demo.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@Getter
-@AllArgsConstructor
 class ErrorResponse {
 
-  private String code;
-  private String message;
+  private final String code;
+  private final String message;
+
+  ErrorResponse(String code, String message) {
+    this.code = code;
+    this.message = message;
+  }
 }
 
 @RestControllerAdvice
