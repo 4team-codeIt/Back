@@ -51,7 +51,7 @@ public class Account {
   private LocalDateTime createdAt;
 
   @LastModifiedDate
-  @Column(name = "update_at", nullable = false)
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 
   @Column(name = "deleted_at")
