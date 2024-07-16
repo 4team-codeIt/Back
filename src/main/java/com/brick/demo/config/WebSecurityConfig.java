@@ -18,7 +18,7 @@ import org.springframework.util.AntPathMatcher;
 public class WebSecurityConfig {
 
   private final TokenProvider tokenProvider;
-  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin");
+  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/swagger-ui/**", "/v3/api-docs/**");
 
   public WebSecurityConfig(TokenProvider tokenProvider) {
     this.tokenProvider = tokenProvider;
@@ -37,6 +37,8 @@ public class WebSecurityConfig {
             .requestMatchers("/auth/signup").permitAll()
             .requestMatchers("/auth/signin").permitAll()
             .requestMatchers("/auth/users/duplicate-email").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(formLogin -> formLogin
@@ -48,6 +50,8 @@ public class WebSecurityConfig {
             .ignoringRequestMatchers("/auth/signup")
             .ignoringRequestMatchers("/auth/signin")
             .ignoringRequestMatchers("/auth/users/duplicate-email")
+            .ignoringRequestMatchers("/swagger-ui/**")
+            .ignoringRequestMatchers("/v3/api-docs/**")
 
         )
         .headers(headers -> headers
