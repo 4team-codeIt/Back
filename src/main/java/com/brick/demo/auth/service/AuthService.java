@@ -70,9 +70,10 @@ public class AuthService {
 
   @Transactional(readOnly = true)
   public DuplicateEmailResponseDto isDuplicatedEmail(DuplicateEmailRequestDto dto) {
-    boolean isDuplicate = accountManager.getAccountByEmail(dto.getEmail()) != null;
-    DuplicateEmailResponseDto response = new DuplicateEmailResponseDto(isDuplicate);
-    return response;
+    throw new CustomException(ErrorDetails.E001);
+//    boolean isDuplicate = accountManager.getAccountByEmail(dto.getEmail()) != null;
+//    DuplicateEmailResponseDto response = new DuplicateEmailResponseDto(isDuplicate);
+//    return response;
   }
 
   public void createAccount(SignUpRequestDto dto) {
@@ -81,7 +82,7 @@ public class AuthService {
     accountManager.save(account);
   }
 
-  public SigninResponseDto signin(SigninRequestDto dto) {
+  public SigninResponseDto signin(SigninRequestDto dto) throws CustomException {
     UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
 
     Authentication authentication = authenticationManagerBuilder.getObject()
