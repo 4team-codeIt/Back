@@ -12,15 +12,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+  private final CorsFilter corsFilter;
   private final TokenProvider tokenProvider;
-  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/swagger-ui/**", "/v3/api-docs/**");
+  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/auth/users/duplicate-email", "/swagger-ui/**", "/v3/api-docs/**");
 
-  public WebSecurityConfig(TokenProvider tokenProvider) {
+  public WebSecurityConfig(CorsFilter corsFilter, TokenProvider tokenProvider) {
+    this.corsFilter = corsFilter;
     this.tokenProvider = tokenProvider;
   }
 
@@ -32,33 +35,24 @@ public class WebSecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/h2-console/**").permitAll() // H2 콘솔에 대한 접근을 허용
-            .requestMatchers("/auth/signup").permitAll()
-            .requestMatchers("/auth/signin").permitAll()
-            .requestMatchers("/auth/users/duplicate-email").permitAll()
-            .requestMatchers("/swagger-ui/**").permitAll()
-            .requestMatchers("/v3/api-docs/**").permitAll()
-            .anyRequest().authenticated()
+        .authorizeHttpRequests(authorize -> {
+                excludeUrls.forEach(url -> authorize.requestMatchers(url).permitAll());
+                authorize.requestMatchers("/h2-console/**").permitAll();
+                authorize.anyRequest().authenticated();
+            }
         )
-        .formLogin(formLogin -> formLogin
-            .loginPage("/signin")
-            .permitAll()
-        )
-        .csrf(csrf -> csrf
-            .ignoringRequestMatchers("/h2-console/**") // H2 콘솔 CSRF 무시 설정
-            .ignoringRequestMatchers("/auth/signup")
-            .ignoringRequestMatchers("/auth/signin")
-            .ignoringRequestMatchers("/auth/users/duplicate-email")
-            .ignoringRequestMatchers("/swagger-ui/**")
-            .ignoringRequestMatchers("/v3/api-docs/**")
-
-        )
+        .formLogin(form -> form.disable())
+        .csrf(csrf -> {
+          excludeUrls.forEach(url -> csrf.ignoringRequestMatchers(url));
+          csrf.ignoringRequestMatchers("/h2-console/**");
+        })
         .headers(headers -> headers
             .frameOptions(frameOptions -> frameOptions.sameOrigin()) // 동일 출처에서 프레임을 허용
         );
 
-    http.addFilterBefore(new JwtRequestFilter(tokenProvider, new AntPathMatcher(), excludeUrls),
+    http
+//        .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new JwtRequestFilter(tokenProvider, new AntPathMatcher(), excludeUrls),
         UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

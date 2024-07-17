@@ -29,6 +29,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   private final List<String> excludeUrls;
 
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    return excludeUrls.stream().anyMatch(url -> pathMatcher.match(url, request.getServletPath()));
+  }
+
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain) throws ServletException, IOException, IOException {
     try {
@@ -50,10 +55,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
   }
 
-  @Override
-  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    return excludeUrls.stream().anyMatch(url -> pathMatcher.match(url, request.getServletPath()));
-  }
 
   // Request Header 에서 토큰 정보를 꺼내오기
   private String resolveToken(HttpServletRequest request) {
