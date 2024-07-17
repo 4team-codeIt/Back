@@ -70,7 +70,11 @@ public class AuthService {
 
   @Transactional(readOnly = true)
   public DuplicateEmailResponseDto isDuplicatedEmail(DuplicateEmailRequestDto dto) {
-    throw new CustomException(ErrorDetails.E001);
+    Optional<Account> account =  accountManager.getAccountByEmail(dto.getEmail());
+    if(account == null) {
+      return new DuplicateEmailResponseDto(false);
+    }
+    return new DuplicateEmailResponseDto(true);
   }
 
   public void createAccount(SignUpRequestDto dto) {
