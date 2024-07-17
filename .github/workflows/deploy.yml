@@ -59,20 +59,22 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_IMAGENAME: ${{ secrets.DOCKER_IMAGENAME }}
+          DOCKER_HOST_PORT: ${{ secrets.DOCKER_HOST_PORT }}
+          DOCKER_CONTAINER_PORT: ${{ secrets.DOCKER_CONTAINER_PORT }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          envs: DOCKER_USERNAME,DOCKER_IMAGENAME
+          envs: DOCKER_USERNAME,DOCKER_IMAGENAME,DOCKER_HOST_PORT,DOCKER_CONTAINER_PORT
           script: |
             sudo docker pull $DOCKER_USERNAME/$DOCKER_IMAGENAME
 
-            CONTAINER_ID=$(sudo docker ps --filter "name=$DOCKER_IMAGENAME"-q)
+            CONTAINER_ID=$(sudo docker ps --filter "name=$DOCKER_IMAGENAME" -q)
             if [ -n "$CONTAINER_ID" ]; then
               sudo docker stop $CONTAINER_ID
               sudo docker rm $CONTAINER_ID
               sudo docker image prune -af
             fi
 
-            sudo docker run -d --name $DOCKER_IMAGENAME -p 80:8080 $DOCKER_USERNAME/$DOCKER_IMAGENAME
+            sudo docker run -d --name $DOCKER_IMAGENAME -p $DOCKER_HOST_PORT:$DOCKER_CONTAINER_PORT $DOCKER_USERNAME/$DOCKER_IMAGENAME

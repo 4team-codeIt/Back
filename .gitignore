@@ -38,3 +38,9 @@ out/
 
 ### src ###
 src/main/resources/application-private.yml
+
+### .env ###
+*.env
+
+### .pem ###
+*.pem
