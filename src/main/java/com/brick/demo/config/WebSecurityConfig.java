@@ -51,7 +51,7 @@ public class WebSecurityConfig {
         );
 
     http
-//        .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(new JwtRequestFilter(tokenProvider, new AntPathMatcher(), excludeUrls),
         UsernamePasswordAuthenticationFilter.class);
 
