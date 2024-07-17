@@ -33,7 +33,7 @@ public class CorsConfig {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
 
-    List<String> allowedOrigins = Arrays.asList(frontDevIp, frontProdIp, frontLocalIp);
+    List<String> allowedOrigins = Arrays.asList(frontDevIp, frontProdIp, frontLocalIp, "https://break-brick.kro.kr");
     allowedOrigins.forEach(config::addAllowedOrigin);
 
     config.addAllowedHeader("*");
