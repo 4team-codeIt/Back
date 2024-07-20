@@ -19,6 +19,7 @@ import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -38,13 +39,13 @@ public class AuthService {
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final TokenProvider tokenProvider;
   private final TokenManager<RefreshToken> refreshTokenManager;
-  private final TokenManager accessTokenTokenManager;
+  private final TokenManager<AccessToken> accessTokenTokenManager;
 
   @Autowired
   public AuthService(AccountManager accountManager, PasswordEncoder passwordEncoder,
       AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider,
       TokenManager<RefreshToken> refreshTokenManager,
-      @Qualifier("accessTokenTokenManager") TokenManager accessTokenTokenManager) {
+      TokenManager<AccessToken> accessTokenTokenManager) {
     this.accountManager = accountManager;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManagerBuilder = authenticationManagerBuilder;
@@ -60,7 +61,7 @@ public class AuthService {
       Authentication authentication = tokenProvider.getAuthentication(accessToken);
       String email = authentication.getName();
       Optional<Account> account = accountManager.getAccountByEmail(email);
-      if (account != null) {
+      if (account.isEmpty()) {
         return Optional.of(new UserResponseDto(account.get().getEmail(), account.get().getName()));
       }
       throw new CustomException(ErrorDetails.E001);
@@ -71,7 +72,7 @@ public class AuthService {
   @Transactional(readOnly = true)
   public DuplicateEmailResponseDto isDuplicatedEmail(DuplicateEmailRequestDto dto) {
     Optional<Account> account =  accountManager.getAccountByEmail(dto.getEmail());
-    if(account == null) {
+    if(account.isEmpty()) {
       return new DuplicateEmailResponseDto(false);
     }
     return new DuplicateEmailResponseDto(true);
@@ -85,7 +86,7 @@ public class AuthService {
 
   public SigninResponseDto signin(SigninRequestDto dto) throws CustomException {
     Optional<Account> account =  accountManager.getAccountByEmail(dto.getEmail());
-    if(account == null) {
+    if(account.isEmpty()) {
       throw new CustomException(ErrorDetails.E002);
     }
     if(!passwordEncoder.matches(dto.getPassword(), account.get().getPassword())) {

@@ -29,7 +29,7 @@ public class JpaAccountManager extends AbstractAccountManager {
           .getSingleResult();
       return Optional.of(account);
     } catch (NoResultException e) {
-      return null; // 계정을 찾지 못한 경우 null을 반환
+      return Optional.empty();
     }
   }
 

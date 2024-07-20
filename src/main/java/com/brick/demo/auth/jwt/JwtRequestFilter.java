@@ -40,11 +40,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       String jwt = resolveToken(request);
       String email = null;
 
-    if (jwt == null) {
-      throw new CustomException(ErrorDetails.E003);
-    }
+      if (jwt == null) {
+        throw new CustomException(ErrorDetails.E003);
+      }
 
-      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+      if (tokenProvider.validateToken(jwt)) {
         Authentication authentication = tokenProvider.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
