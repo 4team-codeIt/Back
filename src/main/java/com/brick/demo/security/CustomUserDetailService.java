@@ -1,12 +1,9 @@
-package com.brick.demo.auth.service;
+package com.brick.demo.security;
 
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountManager;
 import jakarta.transaction.Transactional;
-import java.util.Collection;
-import java.util.Collections;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,6 +1,6 @@
 package com.brick.demo.config;
 
-import com.brick.demo.auth.jwt.JwtRequestFilter;
+import com.brick.demo.security.JwtRequestFilter;
 import com.brick.demo.auth.jwt.TokenProvider;
 import java.util.List;
 import org.springframework.context.annotation.Bean;

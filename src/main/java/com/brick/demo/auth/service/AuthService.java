@@ -1,6 +1,6 @@
 package com.brick.demo.auth.service;
 
-import static com.brick.demo.auth.jwt.JwtRequestFilter.BEARER_PREFIX;
+import static com.brick.demo.security.JwtRequestFilter.BEARER_PREFIX;
 
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
@@ -17,19 +17,16 @@ import com.brick.demo.auth.repository.AccountManager;
 import com.brick.demo.auth.repository.TokenManager;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
-import java.security.Principal;
+import com.brick.demo.security.CustomUserDetails;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.Token;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
