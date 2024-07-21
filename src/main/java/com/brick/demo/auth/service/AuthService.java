@@ -18,6 +18,8 @@ import com.brick.demo.auth.repository.TokenManager;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.security.CustomUserDetails;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,22 +44,24 @@ public class AuthService {
   private final TokenProvider tokenProvider;
   private final TokenManager<RefreshToken> refreshTokenManager;
   private final TokenManager<AccessToken> accessTokenTokenManager;
+  private final SecurityContextLogoutHandler logoutHandler;
 
   @Autowired
   public AuthService(AccountManager accountManager, PasswordEncoder passwordEncoder,
       AuthenticationManagerBuilder authenticationManagerBuilder, TokenProvider tokenProvider,
       TokenManager<RefreshToken> refreshTokenManager,
-      TokenManager<AccessToken> accessTokenTokenManager) {
+      TokenManager<AccessToken> accessTokenTokenManager, SecurityContextLogoutHandler logoutHandler) {
     this.accountManager = accountManager;
     this.passwordEncoder = passwordEncoder;
     this.authenticationManagerBuilder = authenticationManagerBuilder;
     this.tokenProvider = tokenProvider;
     this.refreshTokenManager = refreshTokenManager;
     this.accessTokenTokenManager = accessTokenTokenManager;
+    this.logoutHandler = logoutHandler;
   }
 
   @Transactional(readOnly = true)
-  public Optional<UserResponseDto> getAccountDetail(String authorizationHeader) {
+  public Optional<UserResponseDto> getAccountDetail() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
     return Optional.of(new UserResponseDto(userDetails.getEmail(), userDetails.getName()));
@@ -106,24 +111,21 @@ public class AuthService {
     }
   }
 
-  public ResponseEntity<Void> signout(String authorizationHeader) {
+  public ResponseEntity<Void> signout(HttpServletRequest request, HttpServletResponse response) {
     //TODO: access token, refresh token에 expired time을 추가해서 만료하는 방식으로 수정해야함
-    if (authorizationHeader.startsWith(BEARER_PREFIX)) {
-      String accessToken = authorizationHeader.substring(BEARER_PREFIX.length());
-      Authentication authentication = tokenProvider.getAuthentication(accessToken);
-      String email = authentication.getName();
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
-      //이미 로그아웃 했었는지 검사(재로그인, 토큰 재발급 방지)
-      Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(email);
-      if (existingAccessToken.isEmpty()) {
-        throw new CustomException(ErrorDetails.E005);
-      }
-
-      accessTokenTokenManager.deleteByKey(email);
-      refreshTokenManager.deleteByKey(email);
-      return ResponseEntity.ok().build();
+    //이미 로그아웃 했었는지 검사(재로그인, 토큰 재발급 방지)
+    Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(email);
+    if (existingAccessToken.isEmpty()) {
+      throw new CustomException(ErrorDetails.E005);
     }
-    throw new CustomException(ErrorDetails.E003);
 
+    accessTokenTokenManager.deleteByKey(email);
+    refreshTokenManager.deleteByKey(email);
+    logoutHandler.logout(request, response, authentication);
+
+    return ResponseEntity.ok().build();
   }
 }

@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.CorsFilter;
 
@@ -33,6 +34,11 @@ public class WebSecurityConfig {
   }
 
   @Bean
+  public SecurityContextLogoutHandler securityContextLogoutHandler() {
+    return new SecurityContextLogoutHandler();
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(authorize -> {
@@ -48,7 +54,8 @@ public class WebSecurityConfig {
         })
         .headers(headers -> headers
             .frameOptions(frameOptions -> frameOptions.sameOrigin()) // 동일 출처에서 프레임을 허용
-        );
+        )
+        .logout((logout) -> logout.logoutUrl("/auth/signout"));
 
     http
         .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
