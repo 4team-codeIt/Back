@@ -17,6 +17,7 @@ import com.brick.demo.auth.repository.AccountManager;
 import com.brick.demo.auth.repository.TokenManager;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
+import java.security.Principal;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
@@ -26,6 +27,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,17 +60,9 @@ public class AuthService {
 
   @Transactional(readOnly = true)
   public Optional<UserResponseDto> getAccountDetail(String authorizationHeader) {
-    if (authorizationHeader.startsWith(BEARER_PREFIX)) {
-      String accessToken = authorizationHeader.substring(BEARER_PREFIX.length());
-      Authentication authentication = tokenProvider.getAuthentication(accessToken);
-      String email = authentication.getName();
-      Optional<Account> account = accountManager.getAccountByEmail(email);
-      if (account.isEmpty()) {
-        return Optional.of(new UserResponseDto(account.get().getEmail(), account.get().getName()));
-      }
-      throw new CustomException(ErrorDetails.E001);
-    }
-    throw new CustomException(ErrorDetails.E003);
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    return Optional.of(new UserResponseDto(userDetails.getEmail(), userDetails.getName()));
   }
 
   @Transactional(readOnly = true)
@@ -85,36 +81,32 @@ public class AuthService {
   }
 
   public SigninResponseDto signin(SigninRequestDto dto) throws CustomException {
-    Optional<Account> account =  accountManager.getAccountByEmail(dto.getEmail());
-    if(account.isEmpty()) {
-      throw new CustomException(ErrorDetails.E002);
-    }
-    if(!passwordEncoder.matches(dto.getPassword(), account.get().getPassword())) {
-      throw new CustomException(ErrorDetails.E002);
-    }
-
     UsernamePasswordAuthenticationToken authenticationToken = dto.toAuthentication();
 
-    Authentication authentication = authenticationManagerBuilder.getObject()
-        .authenticate(
-            authenticationToken); //authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 실행됨.
+    try {
+      Authentication authentication = authenticationManagerBuilder.getObject()
+          .authenticate(
+              authenticationToken); //authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 실행됨.
 
-    //이미 로그인 했었는지 검사(재로그인, 토큰 재발급 방지)
-    Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
-    if (existingAccessToken.isPresent()) {
-      throw new CustomException(ErrorDetails.E004);
+      //이미 로그인 했었는지 검사(재로그인, 토큰 재발급 방지)
+      Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
+      if (existingAccessToken.isPresent()) {
+        throw new CustomException(ErrorDetails.E004);
+      }
+
+      TokenDto tokenDto = tokenProvider.generateToken(authentication);
+      AccessToken accessToken = new AccessToken(authentication.getName(),
+          tokenDto.getAccessToken());
+      accessTokenTokenManager.save(accessToken);
+      RefreshToken refreshToken = new RefreshToken(authentication.getName(),
+          tokenDto.getRefreshToken());
+      refreshTokenManager.save(refreshToken);
+
+      return new SigninResponseDto(tokenDto.getGrantType(), tokenDto.getAccessToken(),
+          tokenDto.getAccessTokenExpiresIn());
+    } catch (AuthenticationException e) {
+      throw new CustomException(ErrorDetails.E002);
     }
-
-    TokenDto tokenDto = tokenProvider.generateToken(authentication);
-    AccessToken accessToken = new AccessToken(authentication.getName(),
-        tokenDto.getAccessToken());
-    accessTokenTokenManager.save(accessToken);
-    RefreshToken refreshToken = new RefreshToken(authentication.getName(),
-        tokenDto.getRefreshToken());
-    refreshTokenManager.save(refreshToken);
-
-    return new SigninResponseDto(tokenDto.getGrantType(), tokenDto.getAccessToken(),
-        tokenDto.getAccessTokenExpiresIn());
   }
 
   public ResponseEntity<Void> signout(String authorizationHeader) {

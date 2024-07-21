@@ -28,12 +28,6 @@ public class CustomUserDetailService implements UserDetailsService {
 
   // DB 에 User 값이 존재한다면 UserDetails 객체로 만들어서 리턴
   private UserDetails createUserDetails(Account account) {
-    Collection emptyAuthorities = Collections.emptyList();
-
-    return new User(
-        String.valueOf(account.getEmail()),
-        account.getPassword(),
-        emptyAuthorities
-    );
+    return new CustomUserDetails(account.getEmail(), account.getName(), account.getPassword());
   }
 }
