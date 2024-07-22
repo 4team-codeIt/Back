@@ -9,6 +9,8 @@ public interface AccountManager {
 
   public Optional<Account> getAccountByEmail(String email);
 
+  public Optional<Account> getAccountByName(String name);
+
   public Account save(Account account);
 
   public void update(Account account);

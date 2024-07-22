@@ -4,6 +4,8 @@ import static com.brick.demo.security.JwtRequestFilter.BEARER_PREFIX;
 
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
+import com.brick.demo.auth.dto.DuplicateNameRequestDto;
+import com.brick.demo.auth.dto.DuplicateNameResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
@@ -75,6 +77,17 @@ public class AuthService {
     }
     return new DuplicateEmailResponseDto(true);
   }
+
+
+  @Transactional(readOnly = true)
+  public DuplicateNameResponseDto isDuplicatedName(DuplicateNameRequestDto dto) {
+    Optional<Account> account =  accountManager.getAccountByName(dto.getName());
+    if(account.isEmpty()) {
+      return new DuplicateNameResponseDto(false);
+    }
+    return new DuplicateNameResponseDto(true);
+  }
+
 
   public void createAccount(SignUpRequestDto dto) {
     String encodedPassword = passwordEncoder.encode(dto.getPassword());

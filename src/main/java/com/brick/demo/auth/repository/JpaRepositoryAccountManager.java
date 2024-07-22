@@ -25,6 +25,11 @@ public class JpaRepositoryAccountManager extends AbstractAccountManager{
   }
 
   @Override
+  public Optional<Account> getAccountByName(String name) {
+    return accountRepository.findByName(name);
+  }
+
+  @Override
   @Transactional
   public Account save(Account account) {
     return accountRepository.save(account);

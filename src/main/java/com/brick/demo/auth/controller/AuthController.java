@@ -2,6 +2,8 @@ package com.brick.demo.auth.controller;
 
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
+import com.brick.demo.auth.dto.DuplicateNameRequestDto;
+import com.brick.demo.auth.dto.DuplicateNameResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
@@ -71,6 +73,13 @@ public class AuthController {
   public DuplicateEmailResponseDto duplicateEmail(
       @RequestBody DuplicateEmailRequestDto dto) {
     return authService.isDuplicatedEmail(dto);
+  }
+
+
+  @PostMapping("/users/duplicate-name")
+  public DuplicateNameResponseDto duplicateName(
+      @RequestBody DuplicateNameRequestDto dto) {
+    return authService.isDuplicatedName(dto);
   }
 }
 

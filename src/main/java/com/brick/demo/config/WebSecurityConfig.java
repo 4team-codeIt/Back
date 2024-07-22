@@ -21,7 +21,7 @@ public class WebSecurityConfig {
 
   private final CorsFilter corsFilter;
   private final TokenProvider tokenProvider;
-  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/auth/users/duplicate-email", "/swagger-ui/**", "/v3/api-docs/**");
+  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/auth/users/duplicate-email", "/auth/users/duplicate-name", "/swagger-ui/**", "/v3/api-docs/**");
 
   public WebSecurityConfig(CorsFilter corsFilter, TokenProvider tokenProvider) {
     this.corsFilter = corsFilter;
