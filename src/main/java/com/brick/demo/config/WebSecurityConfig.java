@@ -21,7 +21,7 @@ public class WebSecurityConfig {
 
   private final CorsFilter corsFilter;
   private final TokenProvider tokenProvider;
-  private final List<String> excludeUrls = List.of("/auth/signup", "/auth/signin", "/auth/users/duplicate-email", "/auth/users/duplicate-name", "/swagger-ui/**", "/v3/api-docs/**");
+  private final List<String> excludeUrls = List.of("/h2-console/**", "/auth/signup", "/auth/signin", "/auth/users/duplicate-email", "/auth/users/duplicate-name", "/swagger-ui/**", "/v3/api-docs/**");
 
   public WebSecurityConfig(CorsFilter corsFilter, TokenProvider tokenProvider) {
     this.corsFilter = corsFilter;
@@ -43,14 +43,12 @@ public class WebSecurityConfig {
     http
         .authorizeHttpRequests(authorize -> {
                 excludeUrls.forEach(url -> authorize.requestMatchers(url).permitAll());
-                authorize.requestMatchers("/h2-console/**").permitAll();
                 authorize.anyRequest().authenticated();
             }
         )
         .formLogin(form -> form.disable())
         .csrf(csrf -> {
           excludeUrls.forEach(url -> csrf.ignoringRequestMatchers(url));
-          csrf.ignoringRequestMatchers("/h2-console/**");
         })
         .headers(headers -> headers
             .frameOptions(frameOptions -> frameOptions.sameOrigin()) // 동일 출처에서 프레임을 허용
