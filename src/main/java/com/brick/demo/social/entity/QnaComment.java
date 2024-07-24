@@ -26,36 +26,44 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class QnaComment {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-  @ManyToOne
-  @JoinColumn(name = "writer_id", nullable = false)
-  private Account writer;
+	@ManyToOne
+	@JoinColumn(name = "writer_id", nullable = false)
+	private Account writer;
 
-  @ManyToOne
-  @JoinColumn(name = "qna_id", nullable = false)
-  private Qna qna;
+	@ManyToOne
+	@JoinColumn(name = "qna_id", nullable = false)
+	private Qna qna;
 
-  @Column(nullable = false)
-  private String content;
+	@Column(length = 605, nullable = false)
+	private String content;
 
-  @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+	@CreatedDate
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
 
-  @LastModifiedDate
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt;
+	@LastModifiedDate
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
 
-  @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
-  @Builder
-  public QnaComment(Account writer, Qna qna, String content) {
-    this.writer = writer;
-    this.qna = qna;
-    this.content = content;
-  }
+	@Builder
+	public QnaComment(Account writer, Qna qna, String content) {
+		this.writer = writer;
+		this.qna = qna;
+		this.content = content;
+	}
+
+	public void update(String content) {
+		this.content = content;
+	}
+
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }
