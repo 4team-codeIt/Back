@@ -16,6 +16,7 @@ import com.brick.demo.social.repository.SocialRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,10 +31,18 @@ public class SocialService {
   private final SocialDetailRepository socialDetailRepository;
   private final AccountManager accountManager;
 
-  // TODO 필터링 추가
-  public List<SocialResponse> findAll() {
-    List<Social> socials = socialRepository.findAll();
-    return socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList());
+  private final Sort sortByDate = Sort.by(Sort.Order.desc("gatheringDate"));
+
+  // TODO 필터링 고도화
+  public List<SocialResponse> findAll(final String orderBy) {
+    if (orderBy.equals("popularity")) {
+      return socialRepository.findAllOrderByPopularity().stream()
+          .map(SocialResponse::fromEntity)
+          .collect(Collectors.toList());
+    }
+    return socialRepository.findAll(sortByDate).stream()
+        .map(SocialResponse::fromEntity)
+        .collect(Collectors.toList());
   }
 
   public SocialResponse findById(Long id) throws CustomException {
@@ -76,7 +85,7 @@ public class SocialService {
     if (account.getName() != social.getOwner().getName()) {
       throw new CustomException(ErrorDetails.SOCIAL_NOT_FOUND);
     }
-    socialRepository.deleteById(id);
+    socialRepository.save(Social.cancel(social));
   }
 
   private Account getAccount() {
