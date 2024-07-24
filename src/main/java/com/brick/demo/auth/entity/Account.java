@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,43 +27,60 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Account {
 
-  @Id
-  @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long entityId;
+	@Id
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long entityId;
 
-  @NotEmpty(message = "Name is required")
-  @Column(nullable = false, unique = true)
-  private String name;
+	@NotEmpty(message = "Name is required")
+	@Column(nullable = false, unique = true)
+	private String name;
 
-  @NotEmpty(message = "Email is required")
-  @Column(nullable = false, unique = true)
-  private String email;
+	@NotEmpty(message = "Email is required")
+	@Column(nullable = false, unique = true)
+	private String email;
 
-  @NotEmpty(message = "Password is required")
-  @Column(length = 60, nullable = false)
-  private String password;
+	@NotEmpty(message = "Password is required")
+	@Column(length = 60, nullable = false)
+	private String password;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "oauth_provider")
-  private OAuthProvider oauthProvider;
+	private LocalDate birthday;
 
-  @CreatedDate
-  @Column(name = "created_at", nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+	private String introduce;
 
-  @LastModifiedDate
-  @Column(name = "updated_at", nullable = false)
-  private LocalDateTime updatedAt;
+	@Column(name = "profile_image_url")
+	private String profileImageUrl;
 
-  @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "oauth_provider")
+	private OAuthProvider oauthProvider;
 
-  @Builder
-  public Account(String name, String email, String password, OAuthProvider oauthProvider) {
-    this.name = name;
-    this.email = email;
-    this.password = password;
-    this.oauthProvider = oauthProvider;
-  }
+	@CreatedDate
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
+
+	@Builder
+	public Account(String name, String email, String password, OAuthProvider oauthProvider) {
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.oauthProvider = oauthProvider;
+	}
+
+	public void update(LocalDate birthday, String introduce, String profileImageUrl) {
+		this.birthday = birthday;
+		this.introduce = introduce;
+		this.profileImageUrl = profileImageUrl;
+	}
+	
+	public void softDelete() {
+		this.deletedAt = LocalDateTime.now();
+	}
 }
