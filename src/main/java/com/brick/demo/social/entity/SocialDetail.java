@@ -1,6 +1,7 @@
 package com.brick.demo.social.entity;
 
 import com.brick.demo.common.entity.BaseEntity;
+import com.brick.demo.social.dto.SocialCreateRequest;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,16 +13,14 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "social_detail")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Builder
 public class SocialDetail extends BaseEntity {
 
   @Id
@@ -38,4 +37,16 @@ public class SocialDetail extends BaseEntity {
 
   @Column(name = "geo_location")
   private String geoLocation;
+
+  public SocialDetail(final Social social, final String description, final String geoLocation) {
+    super();
+    this.social = social;
+    this.description = description;
+    this.geoLocation = geoLocation;
+  }
+
+  public static SocialDetail save(final Social social, final SocialCreateRequest dto) {
+    String geoLocation = dto.place().latitude() + " " + dto.place().longitude();
+    return new SocialDetail(social, dto.description(), geoLocation);
+  }
 }
