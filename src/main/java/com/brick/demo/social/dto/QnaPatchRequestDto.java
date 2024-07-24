@@ -13,6 +13,6 @@ public class QnaPatchRequestDto {
 	@Size(max = 40, message = "제목은 40자를 넘을 수 없습니다")
 	private String title;
 
-	@Size(max = 500, message = "내용은 500자를 넘을 수 없습니다")
+	@Size(max = 600, message = "내용은 600자를 넘을 수 없습니다")
 	private String content;
 }
