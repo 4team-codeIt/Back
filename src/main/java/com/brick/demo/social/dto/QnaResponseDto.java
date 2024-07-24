@@ -34,13 +34,7 @@ public class QnaResponseDto {
 		this.createdAt = qna.getCreatedAt();
 		this.updatedAt = updatedAt; // save한 후 get으로 가져온 값을 넣어줘야 함
 		this.comments = comments.stream()
-				.map(comment -> QnaCommentResponseDto.builder()
-						.id(comment.getId())
-						.content(comment.getContent())
-						.writerName(comment.getWriter().getName())
-						.createdAt(comment.getCreatedAt())
-						.updatedAt(comment.getUpdatedAt())
-						.build())
+				.map(QnaCommentResponseDto::new)
 				.collect(Collectors.toList());
 	}
 }
