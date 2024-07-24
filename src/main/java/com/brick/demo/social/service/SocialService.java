@@ -14,6 +14,7 @@ import com.brick.demo.social.entity.SocialDetail;
 import com.brick.demo.social.repository.SocialDetailRepository;
 import com.brick.demo.social.repository.SocialRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,9 +30,10 @@ public class SocialService {
   private final SocialDetailRepository socialDetailRepository;
   private final AccountManager accountManager;
 
-  // TODO 필터링 추가 + DTO 수정 필요
-  public List<Social> findAll() {
-    return socialRepository.findAll();
+  // TODO 필터링 추가
+  public List<SocialResponse> findAll() {
+    List<Social> socials = socialRepository.findAll();
+    return socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList());
   }
 
   public SocialResponse findById(Long id) throws CustomException {

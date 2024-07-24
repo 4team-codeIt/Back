@@ -4,12 +4,12 @@ import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialCreateResponse;
 import com.brick.demo.social.dto.SocialResponse;
 import com.brick.demo.social.dto.SocialUpdateRequest;
-import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.service.SocialService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +26,9 @@ public class SocialController implements SocialControllerDocs {
   private final SocialService socialService;
 
   @GetMapping
-  public List<Social> findAll() {
-    return socialService.findAll();
+  public ResponseEntity<List<SocialResponse>> findAll() {
+    List<SocialResponse> response = socialService.findAll();
+    return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
@@ -53,10 +54,9 @@ public class SocialController implements SocialControllerDocs {
     return ResponseEntity.ok("모임을 성공적으로 수정했습니다");
   }
 
-  // TODO 불필요한 경우 추후 삭제
-  //  @DeleteMapping("/{id}")
-  //  public ResponseEntity<Void> delete(@PathVariable final Long id) {
-  //    socialService.delete(id);
-  //    return null;
-  //  }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> delete(@PathVariable final Long id) {
+    socialService.delete(id);
+    return ResponseEntity.ok("모임을 성공적으로 취소했습니다");
+  }
 }
