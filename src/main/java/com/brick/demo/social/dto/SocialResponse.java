@@ -1,6 +1,7 @@
 package com.brick.demo.social.dto;
 
 import com.brick.demo.social.entity.Social;
+import com.brick.demo.social.enums.ParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -39,7 +40,10 @@ public record SocialResponse(
                 social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
         // TODO 추후 role enum 관리
-        Participant owner = new Participant(social.getOwner().getName(), "TODO 프로필 URL", "role");
+        Participant owner = new Participant(
+            social.getOwner().getName(),
+            "TODO 프로필 URL",
+            ParticipantRole.OWNER.name());
 
         return new SocialResponse(
             social.getId(),

@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "social")
@@ -43,9 +44,11 @@ public class Social extends BaseEntity {
   private LocalDateTime gatheringDate;
 
   @Column(name = "address")
+  @Setter
   private String address;
 
   @Column(name = "image_urls")
+  @Setter
   private String imageUrls;
 
   @Column(name = "tags")
@@ -60,12 +63,17 @@ public class Social extends BaseEntity {
   @Column(name = "dues", nullable = false)
   private Integer dues = 0;
 
+  @Column(name = "canceled")
+  @Setter
+  private Boolean canceled;
+
   @OneToOne(
       mappedBy = "social",
       cascade = CascadeType.ALL,
       fetch = FetchType.LAZY,
       optional = false)
-  private SocialDetail socialDetail;
+  @Setter
+  private SocialDetail detail;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "account_id", nullable = false)
@@ -112,38 +120,19 @@ public class Social extends BaseEntity {
         account);
   }
 
-  public static Social update(final Social social, final SocialUpdateRequest dto) {
-    String address = dto.place().address() + ' ' + dto.place().detailAddress();
-    String imageUrls = String.join(",", dto.imageUrls());
-
-    return new Social(
-        social.getId(),
-        dto.name(),
-        social.getGatheringDate(),
-        address,
-        imageUrls,
-        social.getTags(),
-        social.getMinCount(),
-        social.getMaxCount(),
-        social.getDues(),
-        social.getSocialDetail(),
-        social.getOwner(),
-        social.getParticipants());
+  public static Social update(Social social, final SocialUpdateRequest dto) {
+    social.address = dto.place().address() + ' ' + dto.place().detailAddress();
+    social.imageUrls = String.join(",", dto.imageUrls());
+    return social;
   }
 
-  public static Social updateDetail(final Social social, final SocialDetail detail) {
-    return new Social(
-        social.getId(),
-        social.getName(),
-        social.getGatheringDate(),
-        social.getAddress(),
-        social.getImageUrls(),
-        social.getTags(),
-        social.getMinCount(),
-        social.getMaxCount(),
-        social.getDues(),
-        detail,
-        social.getOwner(),
-        social.getParticipants());
+  public static Social cancel(Social social) {
+    social.canceled = true;
+    return social;
+  }
+
+  public static Social updateDetail(Social social, final SocialDetail detail) {
+    social.detail = detail;
+    return social;
   }
 }
