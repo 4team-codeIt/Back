@@ -12,6 +12,7 @@ import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.repository.QnaCommentRepository;
 import com.brick.demo.social.repository.QnaRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -41,16 +42,15 @@ public class QnaService {
 	}
 
 	@Transactional
-	public QnaResponseDto create(Long socialId, QnaRequestDto dto) {
+	public QnaResponseDto create(Long socialId, @Valid QnaRequestDto dto) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		final String writerName = userDetails.getUsername();
+		final String writerName = userDetails.getName();
 		final Optional<Account> accountOptional = accountManager.getAccountByName(writerName);
 		if (accountOptional.isEmpty()) {
 			throw new CustomException(ErrorDetails.E001);
 		}
 		final Account account = accountOptional.get();
-		log.info("Create Qna : {}", account);
 		Qna qna = dto.toEntity(account, socialId);
 		qna = qnaRepository.save(qna);
 
@@ -80,7 +80,7 @@ public class QnaService {
 		Qna qna = qnaRepository.findById(qnaId)
 				.orElseThrow(
 						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));
-		if (qna.getDeletedAt().isBefore(LocalDateTime.now())) {
+		if (qna.getDeletedAt() != null && qna.getDeletedAt().isBefore(LocalDateTime.now())) {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "이미 삭제된 Qna 입니다");
 		}
 		qna.softDelete();
