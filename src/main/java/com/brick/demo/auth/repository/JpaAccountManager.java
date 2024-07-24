@@ -29,7 +29,20 @@ public class JpaAccountManager extends AbstractAccountManager {
           .getSingleResult();
       return Optional.of(account);
     } catch (NoResultException e) {
-      return null; // 계정을 찾지 못한 경우 null을 반환
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public Optional<Account> getAccountByName(String name) {
+    try {
+      Account account = entityManager.createQuery("SELECT a FROM Account a WHERE a.name = :name",
+              Account.class)
+          .setParameter("name", name)
+          .getSingleResult();
+      return Optional.of(account);
+    } catch (NoResultException e) {
+      return Optional.empty();
     }
   }
 

@@ -32,6 +32,7 @@ public class Account {
   private Long entityId;
 
   @NotEmpty(message = "Name is required")
+  @Column(nullable = false, unique = true)
   private String name;
 
   @NotEmpty(message = "Email is required")

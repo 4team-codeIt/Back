@@ -1,5 +1,6 @@
-package com.brick.demo.auth.jwt;
+package com.brick.demo.security;
 
+import com.brick.demo.auth.jwt.TokenProvider;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
@@ -40,11 +40,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       String jwt = resolveToken(request);
       String email = null;
 
-    if (jwt == null) {
-      throw new CustomException(ErrorDetails.E003);
-    }
+      if (jwt == null) {
+        throw new CustomException(ErrorDetails.E003);
+      }
 
-      if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+      if (tokenProvider.validateToken(jwt)) {
         Authentication authentication = tokenProvider.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }

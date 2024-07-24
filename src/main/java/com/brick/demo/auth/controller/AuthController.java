@@ -2,11 +2,15 @@ package com.brick.demo.auth.controller;
 
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
+import com.brick.demo.auth.dto.DuplicateNameRequestDto;
+import com.brick.demo.auth.dto.DuplicateNameResponseDto;
 import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
 import com.brick.demo.auth.dto.UserResponseDto;
 import com.brick.demo.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +42,8 @@ public class AuthController {
   }
 
   @GetMapping(value = "/user")
-  public Optional<UserResponseDto> accountDetails(
-      @RequestHeader("Authorization") String authorizationHeader) {
-    return authService.getAccountDetail(authorizationHeader);
+  public Optional<UserResponseDto> accountDetails() {
+    return authService.getAccountDetail();
   }
 
   @PostMapping("/signup")
@@ -57,8 +60,8 @@ public class AuthController {
 
   @GetMapping("/signout")
   public ResponseEntity<Void> signout(
-      @RequestHeader("Authorization") String authorizationHeader) {
-    return authService.signout(authorizationHeader);
+      HttpServletRequest request, HttpServletResponse response) {
+    return authService.signout(request, response);
   }
 
 //  @PostMapping("/reissue")
@@ -70,6 +73,13 @@ public class AuthController {
   public DuplicateEmailResponseDto duplicateEmail(
       @RequestBody DuplicateEmailRequestDto dto) {
     return authService.isDuplicatedEmail(dto);
+  }
+
+
+  @PostMapping("/users/duplicate-name")
+  public DuplicateNameResponseDto duplicateName(
+      @RequestBody DuplicateNameRequestDto dto) {
+    return authService.isDuplicatedName(dto);
   }
 }
 

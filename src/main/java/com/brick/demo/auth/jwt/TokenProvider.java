@@ -1,6 +1,7 @@
 package com.brick.demo.auth.jwt;
 
 import com.brick.demo.auth.dto.TokenDto;
+import com.brick.demo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,15 +11,12 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -39,11 +37,13 @@ public class TokenProvider {
 
   public TokenDto generateToken(Authentication authentication) {
     long now = (new Date()).getTime();
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
     Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
     String accessToken = Jwts.builder()
-        .setSubject(authentication.getName())       // payload "sub": "name"
+        .setSubject(userDetails.getUsername())       // payload "sub": "name"  (현재 로직에서는 이메일)
         .setExpiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
+        .claim("name", userDetails.getName()) // payload "name": 사용자이름
         .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
         .compact();
 
@@ -63,11 +63,10 @@ public class TokenProvider {
   public Authentication getAuthentication(String accessToken) {
     // 토큰 복호화
     Claims claims = parseClaims(accessToken);
-    Collection emptyAuthorities = Collections.emptyList();
 
     // UserDetails 객체를 만들어서 Authentication 리턴
-    UserDetails principal = new User(claims.getSubject(), "", emptyAuthorities);
-    return new UsernamePasswordAuthenticationToken(principal, "", emptyAuthorities);
+    CustomUserDetails principal = new CustomUserDetails(claims.getSubject(), claims.get("name", String.class), "");
+    return new UsernamePasswordAuthenticationToken(principal, "", Collections.emptyList());
   }
 
 
