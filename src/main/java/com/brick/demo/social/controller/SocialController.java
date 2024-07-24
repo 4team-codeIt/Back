@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,8 +27,9 @@ public class SocialController implements SocialControllerDocs {
   private final SocialService socialService;
 
   @GetMapping
-  public ResponseEntity<List<SocialResponse>> findAll() {
-    List<SocialResponse> response = socialService.findAll();
+  public ResponseEntity<List<SocialResponse>> findAll(
+      @RequestParam(required = false) final String orderBy) {
+    List<SocialResponse> response = socialService.findAll(orderBy);
     return ResponseEntity.ok(response);
   }
 
