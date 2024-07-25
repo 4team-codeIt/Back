@@ -9,7 +9,10 @@ public enum ErrorDetails {
   E002("INVALID_CREDENTIALS", "잘못된 이메일 또는 비밀번호입니다", HttpStatus.UNAUTHORIZED),
   E003("UNAUTHORIZED", "Authorization 헤더가 필요합니다", HttpStatus.UNAUTHORIZED),
   E004("UNAUTHORIZED", "로그인한 상태에서 로그인 요청을 보낼 수 없습니다", HttpStatus.UNAUTHORIZED),
-  E005("UNAUTHORIZED", "로그아웃한 상태에서 로그아웃 요청을 보낼 수 없습니다", HttpStatus.UNAUTHORIZED);
+  E005("UNAUTHORIZED", "로그아웃한 상태에서 로그아웃 요청을 보낼 수 없습니다", HttpStatus.UNAUTHORIZED),
+
+  SOCIAL_NOT_FOUND("SOCIAL_NOT_FOUND", "아이디에 해당하는 모임을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
+  SOCIAL_FORBIDDEN("SOCIAL_FORBIDDEN", "수정 권한이 없는 모임입니다.", HttpStatus.FORBIDDEN);
 
   private final String code;
   private final String message;
