@@ -18,7 +18,7 @@ public class QnaRequestDto {
 	private String title;
 
 	@NotEmpty(message = "내용은 빈 문자열일 수 없습니다")
-	@Size(max = 500, message = "내용은 500자를 넘을 수 없습니다")
+	@Size(max = 600, message = "내용은 600자를 넘을 수 없습니다")
 	private String content;
 
 	public Qna toEntity(Account writer, Long socialId) {

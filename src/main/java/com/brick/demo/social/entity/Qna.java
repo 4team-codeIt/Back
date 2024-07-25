@@ -42,10 +42,10 @@ public class Qna {
 //  @JoinColumn(name = "social_id", nullable = false)
 //  private Social social;
 
-	@Column(nullable = false)
+	@Column(length = 45, nullable = false)
 	private String title;
 
-	@Column(nullable = false)
+	@Column(length = 605, nullable = false)
 	private String content;
 
 	@CreatedDate

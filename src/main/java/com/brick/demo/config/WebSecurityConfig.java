@@ -21,11 +21,13 @@ public class WebSecurityConfig {
 
 	private final CorsFilter corsFilter;
 	private final TokenProvider tokenProvider;
-	private final List<String> excludeUrls = List.of("/h2-console/**", "/swagger-ui/**",
+	private final List<String> excludeUrlsJwtfilter = List.of("/h2-console/**", "/swagger-ui/**",
 			"/v3/api-docs/**", "/auth/signup", "/auth/signin",
-			"/auth/users/duplicate-email", "/auth/users/duplicate-name",
-			"/socials/{socialId}/qnas",
-			"/socials/{socialId}/qnas/{qnaId}");
+			"/auth/users/duplicate-email", "/auth/users/duplicate-name"
+	);
+	private final List<String> excludeUrlsCsrf = List.of("/auth/users", "/socials/*/qnas",
+			"/socials/*/qnas/*", "/socials/*/qnas/*/comments",
+			"/socials/*/qnas/*/comments/*");
 
 	public WebSecurityConfig(CorsFilter corsFilter, TokenProvider tokenProvider) {
 		this.corsFilter = corsFilter;
@@ -46,22 +48,23 @@ public class WebSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.authorizeHttpRequests(authorize -> {
-							excludeUrls.forEach(url -> authorize.requestMatchers(url).permitAll());
+							excludeUrlsJwtfilter.forEach(url -> authorize.requestMatchers(url).permitAll());
 							authorize.anyRequest().authenticated();
 						}
 				)
 				.formLogin(form -> form.disable())
 				.csrf(csrf -> {
-					excludeUrls.forEach(url -> csrf.ignoringRequestMatchers(url));
+					excludeUrlsJwtfilter.forEach(csrf::ignoringRequestMatchers);
+					excludeUrlsCsrf.forEach(csrf::ignoringRequestMatchers);
 				})
-				.csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
 				.headers(headers -> headers
 						.frameOptions(frameOptions -> frameOptions.sameOrigin()) // 동일 출처에서 프레임을 허용
 				)
 				.logout((logout) -> logout.logoutUrl("/auth/signout"));
 		http
 				.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-				.addFilterBefore(new JwtRequestFilter(tokenProvider, new AntPathMatcher(), excludeUrls),
+				.addFilterBefore(
+						new JwtRequestFilter(tokenProvider, new AntPathMatcher(), excludeUrlsJwtfilter),
 						UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
