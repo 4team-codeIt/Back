@@ -8,6 +8,8 @@ import com.brick.demo.auth.repository.InMemoryAccessTokenManager;
 import com.brick.demo.auth.repository.InMemoryRefreshTokenManager;
 import com.brick.demo.auth.repository.JpaRepositoryAccountManager;
 import com.brick.demo.auth.repository.TokenManager;
+import com.brick.demo.social.repository.QnaCommentRepository;
+import com.brick.demo.social.repository.QnaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
@@ -19,13 +21,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class ApplicationConfig {
 
-  private final AccountRepository accountRepository;
+	private final AccountRepository accountRepository;
 
-  @Autowired
-  public ApplicationConfig(AccountRepository accountRepository) {
-    this.accountRepository = accountRepository;
-  }
-
+	@Autowired
+	public ApplicationConfig(AccountRepository accountRepository) {
+		this.accountRepository = accountRepository;
+	}
+  
   @Bean
   public AccountManager accountManager() {
     return new JpaRepositoryAccountManager(accountRepository);
@@ -41,4 +43,5 @@ public class ApplicationConfig {
   public TokenManager<RefreshToken> refreshTokenManager() {
     return new InMemoryRefreshTokenManager();
   }
+  
 }
