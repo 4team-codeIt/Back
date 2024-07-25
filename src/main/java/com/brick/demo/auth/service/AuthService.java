@@ -10,6 +10,7 @@ import com.brick.demo.auth.dto.SignUpRequestDto;
 import com.brick.demo.auth.dto.SigninRequestDto;
 import com.brick.demo.auth.dto.SigninResponseDto;
 import com.brick.demo.auth.dto.TokenDto;
+import com.brick.demo.auth.dto.UserPatchRequestDto;
 import com.brick.demo.auth.dto.UserResponseDto;
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.jwt.AccessToken;
@@ -22,9 +23,11 @@ import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -67,9 +70,13 @@ public class AuthService {
 	public Optional<UserResponseDto> getAccountDetail() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		log.info("큐앤에이 서비스 : {}", authentication);
-		log.info("큐앤에이 서비스 유저디테일 : {}", authentication.getPrincipal());
-		return Optional.of(new UserResponseDto(userDetails.getEmail(), userDetails.getName()));
+		final String writerName = userDetails.getName();
+		final Optional<Account> accountOptional = accountManager.getAccountByName(writerName);
+		if (accountOptional.isEmpty()) {
+			throw new CustomException(ErrorDetails.E001);
+		}
+		final Account account = accountOptional.get();
+		return Optional.of(new UserResponseDto(account));
 	}
 
 	@Transactional(readOnly = true)
@@ -91,11 +98,47 @@ public class AuthService {
 		return new DuplicateNameResponseDto(true);
 	}
 
-
+	@Transactional
 	public void createAccount(SignUpRequestDto dto) {
 		String encodedPassword = passwordEncoder.encode(dto.getPassword());
 		Account account = dto.toEntity(passwordEncoder);
 		accountManager.save(account);
+	}
+
+	@Transactional
+	public UserResponseDto updateAccount(UserPatchRequestDto dto) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String email = authentication.getName();
+		final Optional<Account> accountOptional = accountManager.getAccountByEmail(email);
+		if (accountOptional.isEmpty()) {
+			throw new CustomException(ErrorDetails.E001);
+		}
+		final Account account = accountOptional.get();
+
+		final LocalDate birthday =
+				(dto.getBirthday() != null) ? dto.getBirthday() : account.getBirthday();
+		final String introduce =
+				(dto.getIntroduce() != null) ? dto.getIntroduce() : account.getIntroduce();
+		final String profileImageUrl = (dto.getProfileImageUrl() != null) ? dto.getProfileImageUrl()
+				: account.getProfileImageUrl();
+		account.update(birthday, introduce, profileImageUrl);
+		accountManager.save(account);
+		return new UserResponseDto(account);
+	}
+
+	@Transactional
+	public void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String email = authentication.getName();
+		final Optional<Account> accountOptional = accountManager.getAccountByEmail(email);
+		if (accountOptional.isEmpty()) {
+			throw new CustomException(ErrorDetails.E001);
+		}
+		final Account account = accountOptional.get();
+		account.softDelete();
+		accountManager.save(account);
+
+		deleteTokens(request, response); //로그아웃
 	}
 
 	public SigninResponseDto signin(SigninRequestDto dto) throws CustomException {
@@ -110,6 +153,12 @@ public class AuthService {
 			Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
 			if (existingAccessToken.isPresent()) {
 				throw new CustomException(ErrorDetails.E004);
+			}
+
+			//탈퇴한 회원인지 검사
+			final Optional<Account> accountOptional = accountManager.getAccountByEmail(dto.getEmail());
+			if (accountOptional.isPresent() && accountOptional.get().getDeletedAt() != null) {
+				throw new CustomException(HttpStatus.BAD_REQUEST, "이미 탈퇴한 회원입니다");
 			}
 
 			TokenDto tokenDto = tokenProvider.generateToken(authentication);
@@ -128,6 +177,12 @@ public class AuthService {
 	}
 
 	public ResponseEntity<Void> signout(HttpServletRequest request, HttpServletResponse response) {
+		deleteTokens(request, response);
+		return ResponseEntity.ok().build();
+	}
+
+
+	private void deleteTokens(HttpServletRequest request, HttpServletResponse response) {
 		//TODO: access token, refresh token에 expired time을 추가해서 만료하는 방식으로 수정해야함
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String email = authentication.getName();
@@ -141,7 +196,5 @@ public class AuthService {
 		accessTokenTokenManager.deleteByKey(email);
 		refreshTokenManager.deleteByKey(email);
 		logoutHandler.logout(request, response, authentication);
-
-		return ResponseEntity.ok().build();
 	}
 }
