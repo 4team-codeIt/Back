@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface SocialRepository extends JpaRepository<Social, Long> {
   List<Social> findAllByOrderByGatheringDateDesc();
 
-  List<Social> findAllByGatheringDateAfter(LocalDateTime date);
+  List<Social> findAllByGatheringDateBeforeOrderByGatheringDateDesc(LocalDateTime date);
 
-  List<Social> findByGatheringDateBefore(LocalDateTime date);
+  List<Social> findAllByGatheringDateAfterOrderByGatheringDateDesc(LocalDateTime date);
 }
