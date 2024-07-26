@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/socials/{socialId}/qnas")
-public class QnaController {
+public class QnaController implements QnaControllerDocs {
 
 	private static final Logger log = LoggerFactory.getLogger(QnaController.class);
 	private final QnaService qnaService;
