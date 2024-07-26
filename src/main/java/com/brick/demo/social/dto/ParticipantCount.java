@@ -14,4 +14,8 @@ public record ParticipantCount(
     @Schema(description = "현재 인원 수", requiredMode = RequiredMode.NOT_REQUIRED)
     Integer current
 ) {
+
+    public ParticipantCount(final Integer min, final Integer max) {
+        this(min, max, null);
+    }
 }
