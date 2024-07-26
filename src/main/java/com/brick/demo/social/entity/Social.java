@@ -120,19 +120,16 @@ public class Social extends BaseEntity {
         account);
   }
 
-  public static Social update(Social social, final SocialUpdateRequest dto) {
-    social.address = dto.place().address() + ' ' + dto.place().detailAddress();
-    social.imageUrls = String.join(",", dto.imageUrls());
-    return social;
+  public void update(final SocialUpdateRequest dto) {
+    this.address = dto.place().address() + ' ' + dto.place().detailAddress();
+    this.imageUrls = String.join(",", dto.imageUrls());
   }
 
-  public static Social cancel(Social social) {
-    social.canceled = true;
-    return social;
+  public void cancel() {
+    this.canceled = true;
   }
 
-  public static Social updateDetail(Social social, final SocialDetail detail) {
-    social.detail = detail;
-    return social;
+  public void updateDetail(final SocialDetail detail) {
+    this.detail = detail;
   }
 }

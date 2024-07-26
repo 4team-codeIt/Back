@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class SocialService {
 
@@ -36,6 +35,7 @@ public class SocialService {
   private final AccountManager accountManager;
 
   // TODO 필터링 고도화
+  @Transactional
   public List<SocialResponse> selectSocials(final String orderBy) {
     //    if (orderBy.equals("popularity")) {
     //      return socialRepository.findAll(sortByPopularity).stream()
@@ -47,6 +47,7 @@ public class SocialService {
         .collect(Collectors.toList());
   }
 
+  @Transactional
   public SocialResponse selectSocialById(Long id) throws CustomException {
     Social social =
         socialRepository
@@ -56,17 +57,20 @@ public class SocialService {
     return SocialResponse.fromEntity(social);
   }
 
+  @Transactional
   public SocialCreateResponse createSocial(final SocialCreateRequest dto) {
     Account account = getAccount();
     Social social = socialRepository.save(Social.save(account, dto));
     SocialDetail detail = socialDetailRepository.save(SocialDetail.save(social, dto));
 
     socialParticipantRepository.save(new SocialParticipant(social, account));
-    socialRepository.save(Social.updateDetail(social, detail));
+    social.updateDetail(detail);
+    socialRepository.save(social);
 
     return new SocialCreateResponse(social.getId(), "모임을 성공적으로 생성하였습니다.");
   }
 
+  @Transactional
   public void updateSocial(final Long id, final SocialUpdateRequest dto) {
     Account account = getAccount();
     Social social =
@@ -77,9 +81,12 @@ public class SocialService {
     if (!account.getName().equals(social.getOwner().getName())) {
       throw new CustomException(ErrorDetails.SOCIAL_FORBIDDEN);
     }
-    socialRepository.save(Social.update(social, dto));
+
+    social.update(dto);
+    socialRepository.save(social);
   }
 
+  @Transactional
   public void cancelSocial(Long id) {
     Account account = getAccount();
     Social social =
@@ -90,9 +97,12 @@ public class SocialService {
     if (!account.getName().equals(social.getOwner().getName())) {
       throw new CustomException(ErrorDetails.SOCIAL_FORBIDDEN);
     }
-    socialRepository.save(Social.cancel(social));
+
+    social.cancel();
+    socialRepository.save(social);
   }
 
+  @Transactional
   public SocialDetailResponse selectDetailBySocialId(final Long id) {
     Social social =
         socialRepository
@@ -106,6 +116,7 @@ public class SocialService {
     return SocialDetailResponse.fromEntities(social, detail);
   }
 
+  @Transactional
   public void joinSocial(final Long id) {
     Account account = getAccount();
     Social social =
@@ -117,6 +128,7 @@ public class SocialService {
     socialParticipantRepository.save(new SocialParticipant(social, account));
   }
 
+  @Transactional
   public void leaveSocial(final Long id) {
     Account account = getAccount();
     Social social =
