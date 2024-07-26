@@ -31,13 +31,9 @@ class SocialRepositoryTest {
   void 테스트_데이터_삽입() {
     Account account = accountRepository.save(ACCOUNT);
 
-    Social social1 = Social.save(account, TODAY_SOCIAL);
-    Social social2 = Social.save(account, FUTURE_SOCIAL);
-    Social social3 = Social.save(account, PAST_SOCIAL);
-
-    socialRepository.save(social1);
-    socialRepository.save(social2);
-    socialRepository.save(social3);
+    socialRepository.save(Social.save(account, TODAY_SOCIAL));
+    socialRepository.save(Social.save(account, FUTURE_SOCIAL));
+    socialRepository.save(Social.save(account, PAST_SOCIAL));
   }
 
   @Test
