@@ -105,8 +105,8 @@ public class Social extends BaseEntity {
 
   public static Social save(final Account account, final SocialCreateRequest dto) {
     String address = dto.place().address() + ' ' + dto.place().detailAddress();
-    String imageUrls = String.join(",", dto.imageUrls());
-    String tags = String.join(",", dto.tags());
+    String imageUrls = dto.imageUrls() == null ? null : String.join(",", dto.imageUrls());
+    String tags = dto.tags() == null ? null : String.join(",", dto.tags());
 
     return new Social(
         dto.name(),
