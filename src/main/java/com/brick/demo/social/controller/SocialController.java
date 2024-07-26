@@ -20,45 +20,45 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("social")
+@RequestMapping("/socials")
 @RequiredArgsConstructor
 public class SocialController implements SocialControllerDocs {
 
-  private final SocialService socialService;
+	private final SocialService socialService;
 
-  @GetMapping
-  public ResponseEntity<List<SocialResponse>> findAll(
-      @RequestParam(required = false) final String orderBy) {
-    List<SocialResponse> response = socialService.findAll(orderBy);
-    return ResponseEntity.ok(response);
-  }
+	@GetMapping
+	public ResponseEntity<List<SocialResponse>> findAll(
+			@RequestParam(required = false) final String orderBy) {
+		List<SocialResponse> response = socialService.findAll(orderBy);
+		return ResponseEntity.ok(response);
+	}
 
-  @GetMapping("/{id}")
-  public ResponseEntity<SocialResponse> findById(@PathVariable final Long id) {
-    SocialResponse response = socialService.findById(id);
+	@GetMapping("/{id}")
+	public ResponseEntity<SocialResponse> findById(@PathVariable final Long id) {
+		SocialResponse response = socialService.findById(id);
 
-    return ResponseEntity.ok(response);
-  }
+		return ResponseEntity.ok(response);
+	}
 
-  @PostMapping
-  public ResponseEntity<SocialCreateResponse> save(
-      @RequestBody @Valid final SocialCreateRequest dto) {
-    SocialCreateResponse response = socialService.save(dto);
+	@PostMapping
+	public ResponseEntity<SocialCreateResponse> save(
+			@RequestBody @Valid final SocialCreateRequest dto) {
+		SocialCreateResponse response = socialService.save(dto);
 
-    return ResponseEntity.ok(response);
-  }
+		return ResponseEntity.ok(response);
+	}
 
-  @PatchMapping("/{id}")
-  public ResponseEntity<String> update(
-      @PathVariable final Long id, @RequestBody @Valid final SocialUpdateRequest dto) {
-    socialService.update(id, dto);
+	@PatchMapping("/{id}")
+	public ResponseEntity<String> update(
+			@PathVariable final Long id, @RequestBody @Valid final SocialUpdateRequest dto) {
+		socialService.update(id, dto);
 
-    return ResponseEntity.ok("모임을 성공적으로 수정했습니다");
-  }
+		return ResponseEntity.ok("모임을 성공적으로 수정했습니다");
+	}
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<String> delete(@PathVariable final Long id) {
-    socialService.delete(id);
-    return ResponseEntity.ok("모임을 성공적으로 취소했습니다");
-  }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> delete(@PathVariable final Long id) {
+		socialService.delete(id);
+		return ResponseEntity.ok("모임을 성공적으로 취소했습니다");
+	}
 }

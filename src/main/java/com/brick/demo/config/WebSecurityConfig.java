@@ -25,7 +25,8 @@ public class WebSecurityConfig {
 			"/v3/api-docs/**", "/auth/signup", "/auth/signin",
 			"/auth/users/duplicate-email", "/auth/users/duplicate-name"
 	);
-	private final List<String> excludeUrlsCsrf = List.of("/auth/users", "/socials/*/qnas",
+	private final List<String> excludeUrlsCsrf = List.of("/auth/users", "/socials",
+			"/socials/*/qnas",
 			"/socials/*/qnas/*", "/socials/*/qnas/*/comments",
 			"/socials/*/qnas/*/comments/*");
 
