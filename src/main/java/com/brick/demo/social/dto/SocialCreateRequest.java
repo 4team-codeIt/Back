@@ -31,4 +31,8 @@ public record SocialCreateRequest (
     @Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
     String[] tags
     ) {
+
+    public SocialCreateRequest(final String name, final String description, final LocalDateTime gatheringDate, final ParticipantCount participantCount, final Place place) {
+        this(name, description, gatheringDate, participantCount, place, null, 0, null);
+    }
 }

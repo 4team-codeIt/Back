@@ -105,8 +105,8 @@ public class Social extends BaseEntity {
 
   public static Social save(final Account account, final SocialCreateRequest dto) {
     String address = dto.place().address() + ' ' + dto.place().detailAddress();
-    String imageUrls = String.join(",", dto.imageUrls());
-    String tags = String.join(",", dto.tags());
+    String imageUrls = dto.imageUrls() == null ? null : String.join(",", dto.imageUrls());
+    String tags = dto.tags() == null ? null : String.join(",", dto.tags());
 
     return new Social(
         dto.name(),
@@ -120,19 +120,16 @@ public class Social extends BaseEntity {
         account);
   }
 
-  public static Social update(Social social, final SocialUpdateRequest dto) {
-    social.address = dto.place().address() + ' ' + dto.place().detailAddress();
-    social.imageUrls = String.join(",", dto.imageUrls());
-    return social;
+  public void update(final SocialUpdateRequest dto) {
+    this.address = dto.place().address() + ' ' + dto.place().detailAddress();
+    this.imageUrls = String.join(",", dto.imageUrls());
   }
 
-  public static Social cancel(Social social) {
-    social.canceled = true;
-    return social;
+  public void cancel() {
+    this.canceled = true;
   }
 
-  public static Social updateDetail(Social social, final SocialDetail detail) {
-    social.detail = detail;
-    return social;
+  public void updateDetail(final SocialDetail detail) {
+    this.detail = detail;
   }
 }
