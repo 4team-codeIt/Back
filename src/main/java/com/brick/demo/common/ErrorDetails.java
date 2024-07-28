@@ -12,7 +12,15 @@ public enum ErrorDetails {
   E005("UNAUTHORIZED", "로그아웃한 상태에서 로그아웃 요청을 보낼 수 없습니다", HttpStatus.UNAUTHORIZED),
 
   SOCIAL_NOT_FOUND("SOCIAL_NOT_FOUND", "아이디에 해당하는 모임을 찾을 수 없습니다", HttpStatus.NOT_FOUND),
-  SOCIAL_FORBIDDEN("SOCIAL_FORBIDDEN", "수정 권한이 없는 모임입니다.", HttpStatus.FORBIDDEN);
+  SOCIAL_FORBIDDEN("SOCIAL_FORBIDDEN", "수정 권한이 없는 모임입니다", HttpStatus.FORBIDDEN),
+
+  SOCIAL_EXCEED_MAX_LIMIT(
+      "SOCIAL_EXCEED_MAX_LIMIT", "최대 인원을 초과하여 더 이상 참여할 수 없습니다", HttpStatus.BAD_REQUEST),
+  SOCIAL_ALREADY_JOINED("SOCIAL_ALREADY_JOINED", "이미 참여한 모임입니다", HttpStatus.BAD_REQUEST),
+  SOCIAL_ALREADY_PASSED("SOCIAL_ALREADY_PASSED", "이미 지난 모임입니다", HttpStatus.BAD_REQUEST),
+  SOCIAL_NOT_JOINED("SOCIAL_NOT_JOINED", "참여한 모임이 아닙니다", HttpStatus.BAD_REQUEST),
+  SOCIAL_OWNER_LEAVE_FORBIDDEN(
+      "SOCIAL_OWNER_LEAVE_FORBIDDEN", "모임의 주최자는 참여를 취소할 수 없습니다", HttpStatus.FORBIDDEN);
 
   private final String code;
   private final String message;

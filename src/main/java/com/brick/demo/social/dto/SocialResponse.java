@@ -39,7 +39,8 @@ public record SocialResponse(
             new ParticipantCount(
                 social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-        // TODO 추후 role enum 관리
+        String thumbnail = social.getImageUrls().split(",")[0];
+
         Participant owner = new Participant(
             social.getOwner().getName(),
             "TODO 프로필 URL",
@@ -51,7 +52,7 @@ public record SocialResponse(
             social.getGatheringDate(),
             social.getAddress(),
             participantCount,
-            social.getImageUrls(),
+            thumbnail,
             social.getTags().split(","),
             owner
         );
