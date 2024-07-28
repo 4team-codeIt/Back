@@ -20,7 +20,7 @@ public enum ErrorDetails {
   SOCIAL_ALREADY_PASSED("SOCIAL_ALREADY_PASSED", "이미 지난 모임입니다", HttpStatus.BAD_REQUEST),
   SOCIAL_NOT_JOINED("SOCIAL_NOT_JOINED", "참여한 모임이 아닙니다", HttpStatus.BAD_REQUEST),
   SOCIAL_OWNER_LEAVE_FORBIDDEN(
-      "SOCIAL_OWNER_LEAVE_FORBIDDEN", "모임의 주최자는 참여를 취소할 수 없습니다", HttpStatus.BAD_REQUEST);
+      "SOCIAL_OWNER_LEAVE_FORBIDDEN", "모임의 주최자는 참여를 취소할 수 없습니다", HttpStatus.FORBIDDEN);
 
   private final String code;
   private final String message;
