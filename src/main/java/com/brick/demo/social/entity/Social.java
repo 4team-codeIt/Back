@@ -82,42 +82,20 @@ public class Social extends BaseEntity {
   @OneToMany(mappedBy = "social", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<SocialParticipant> participants = new HashSet<>();
 
-  public Social(
-      String name,
-      LocalDateTime gatheringDate,
-      String address,
-      String imageUrls,
-      String tags,
-      Integer min,
-      Integer max,
-      Integer dues,
-      Account account) {
-    this.name = name;
-    this.gatheringDate = gatheringDate;
-    this.address = address;
-    this.imageUrls = imageUrls;
-    this.tags = tags;
-    this.minCount = min;
-    this.maxCount = max;
-    this.dues = dues;
-    this.owner = account;
-  }
-
-  public static Social save(final Account account, final SocialCreateRequest dto) {
+  public Social(final Account account, final SocialCreateRequest dto) {
     String address = dto.place().address() + ' ' + dto.place().detailAddress();
     String imageUrls = dto.imageUrls() == null ? null : String.join(",", dto.imageUrls());
     String tags = dto.tags() == null ? null : String.join(",", dto.tags());
 
-    return new Social(
-        dto.name(),
-        dto.gatheringDate(),
-        address,
-        imageUrls,
-        tags,
-        dto.participantCount().min(),
-        dto.participantCount().max(),
-        dto.dues(),
-        account);
+    this.name = dto.name();
+    this.gatheringDate = dto.gatheringDate();
+    this.address = address;
+    this.imageUrls = imageUrls;
+    this.tags = tags;
+    this.minCount = dto.participantCount().min();
+    this.maxCount = dto.participantCount().max();
+    this.dues = dto.dues();
+    this.owner = account;
   }
 
   public void update(final SocialUpdateRequest dto) {

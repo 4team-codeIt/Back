@@ -39,14 +39,14 @@ public class SocialDetail extends BaseEntity {
   private String geoLocation;
 
   public SocialDetail(final Social social, final String description, final String geoLocation) {
-    super();
     this.social = social;
     this.description = description;
     this.geoLocation = geoLocation;
   }
 
-  public static SocialDetail save(final Social social, final SocialCreateRequest dto) {
-    String geoLocation = dto.place().latitude() + " " + dto.place().longitude();
-    return new SocialDetail(social, dto.description(), geoLocation);
+  public SocialDetail(final Social social, final SocialCreateRequest dto) {
+    this.social = social;
+    this.description = dto.description();
+    this.geoLocation = dto.place().latitude() + " " + dto.place().longitude();
   }
 }
