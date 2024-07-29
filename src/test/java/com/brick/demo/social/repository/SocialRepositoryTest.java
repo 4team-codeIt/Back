@@ -1,9 +1,9 @@
 package com.brick.demo.social.repository;
 
 import static com.brick.demo.fixture.AccountFixture.ACCOUNT;
-import static com.brick.demo.fixture.SocialFixture.FUTURE_SOCIAL;
-import static com.brick.demo.fixture.SocialFixture.PAST_SOCIAL;
-import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL;
+import static com.brick.demo.fixture.SocialFixture.FUTURE_SOCIAL_CREATE_REQUEST;
+import static com.brick.demo.fixture.SocialFixture.PAST_SOCIAL_CREATE_REQUEST;
+import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL_CREATE_REQUEST;
 import static com.brick.demo.fixture.SocialFixture.TOMORROW;
 import static com.brick.demo.fixture.SocialFixture.YESTERDAY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,13 +27,25 @@ class SocialRepositoryTest {
 
   @Autowired private SocialRepository socialRepository;
 
+  private Account account;
+
   @BeforeEach
   void 테스트_데이터_삽입() {
-    Account account = accountRepository.save(ACCOUNT);
+    account = accountRepository.save(ACCOUNT);
 
-    socialRepository.save(Social.save(account, TODAY_SOCIAL));
-    socialRepository.save(Social.save(account, FUTURE_SOCIAL));
-    socialRepository.save(Social.save(account, PAST_SOCIAL));
+    socialRepository.save(new Social(account, TODAY_SOCIAL_CREATE_REQUEST));
+    socialRepository.save(new Social(account, FUTURE_SOCIAL_CREATE_REQUEST));
+    socialRepository.save(new Social(account, PAST_SOCIAL_CREATE_REQUEST));
+  }
+
+  @Test
+  void 모임_생성일자_내림차순으로_모임을_조회한다() {
+    List<Social> socials = socialRepository.findAllByOrderByCreatedAtDesc();
+
+    assertAll(
+        () -> assertThat(socials).hasSize(3),
+        () -> assertThat(socials.get(0).getName()).isEqualTo(PAST_SOCIAL_CREATE_REQUEST.name()),
+        () -> assertThat(socials.get(2).getName()).isEqualTo(TODAY_SOCIAL_CREATE_REQUEST.name()));
   }
 
   @Test
@@ -42,8 +54,8 @@ class SocialRepositoryTest {
 
     assertAll(
         () -> assertThat(socials).hasSize(3),
-        () -> assertThat(socials.get(0).getName()).isEqualTo(FUTURE_SOCIAL.name()),
-        () -> assertThat(socials.get(2).getName()).isEqualTo(PAST_SOCIAL.name()));
+        () -> assertThat(socials.get(0).getName()).isEqualTo(FUTURE_SOCIAL_CREATE_REQUEST.name()),
+        () -> assertThat(socials.get(2).getName()).isEqualTo(PAST_SOCIAL_CREATE_REQUEST.name()));
   }
 
   @Test
@@ -53,8 +65,8 @@ class SocialRepositoryTest {
 
     assertAll(
         () -> assertThat(socials).hasSize(2),
-        () -> assertThat(socials.get(0).getName()).isEqualTo(TODAY_SOCIAL.name()),
-        () -> assertThat(socials.get(1).getName()).isEqualTo(PAST_SOCIAL.name()));
+        () -> assertThat(socials.get(0).getName()).isEqualTo(TODAY_SOCIAL_CREATE_REQUEST.name()),
+        () -> assertThat(socials.get(1).getName()).isEqualTo(PAST_SOCIAL_CREATE_REQUEST.name()));
   }
 
   @Test
@@ -64,7 +76,25 @@ class SocialRepositoryTest {
 
     assertAll(
         () -> assertThat(socials).hasSize(2),
-        () -> assertThat(socials.get(0).getName()).isEqualTo(FUTURE_SOCIAL.name()),
-        () -> assertThat(socials.get(1).getName()).isEqualTo(TODAY_SOCIAL.name()));
+        () -> assertThat(socials.get(0).getName()).isEqualTo(FUTURE_SOCIAL_CREATE_REQUEST.name()),
+        () -> assertThat(socials.get(1).getName()).isEqualTo(TODAY_SOCIAL_CREATE_REQUEST.name()));
+  }
+
+  @Test
+  void 취소된_모임을_생성일자_내림차순으로_조회한다() {
+    Social social = socialRepository.save(new Social(account, TODAY_SOCIAL_CREATE_REQUEST));
+    social.cancel();
+
+    List<Social> socials = socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc();
+
+    assertThat(socials).hasSize(1);
+  }
+
+  @Test
+  void 특정_주최자의_모임을_생성일자_오름차순으로_조회한다() {
+    List<Social> socials =
+        socialRepository.findAllByOwnerEntityIdOrderByCreatedAtDesc(ACCOUNT.getEntityId());
+
+    assertThat(socials).hasSize(0);
   }
 }
