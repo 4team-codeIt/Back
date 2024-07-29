@@ -34,15 +34,9 @@ public class SocialService {
   private final SocialParticipantRepository socialParticipantRepository;
   private final AccountManager accountManager;
 
-  // TODO 필터링 고도화
   @Transactional
-  public List<SocialResponse> selectSocials(final String orderBy) {
-    //    if (orderBy.equals("popularity")) {
-    //      return socialRepository.findAll(sortByPopularity).stream()
-    //          .map(SocialResponse::fromEntity)
-    //          .collect(Collectors.toList());
-    //    }
-    return socialRepository.findAllByOrderByGatheringDateDesc().stream()
+  public List<SocialResponse> selectSocials(final String filterBy, final String orderBy) {
+    return findAllSocials(filterBy, orderBy).stream()
         .map(SocialResponse::fromEntity)
         .collect(Collectors.toList());
   }
@@ -60,12 +54,11 @@ public class SocialService {
   @Transactional
   public SocialCreateResponse createSocial(final SocialCreateRequest dto) {
     Account account = getAccount();
-    Social social = socialRepository.save(Social.save(account, dto));
-    SocialDetail detail = socialDetailRepository.save(SocialDetail.save(social, dto));
+    Social social = socialRepository.save(new Social(account, dto));
+    SocialDetail detail = socialDetailRepository.save(new SocialDetail(social, dto));
 
     socialParticipantRepository.save(new SocialParticipant(social, account));
     social.updateDetail(detail);
-    socialRepository.save(social);
 
     return new SocialCreateResponse(social.getId(), "모임을 성공적으로 생성하였습니다.");
   }
@@ -83,7 +76,6 @@ public class SocialService {
     }
 
     social.update(dto);
-    socialRepository.save(social);
   }
 
   @Transactional
@@ -99,7 +91,6 @@ public class SocialService {
     }
 
     social.cancel();
-    socialRepository.save(social);
   }
 
   @Transactional
@@ -116,79 +107,24 @@ public class SocialService {
     return SocialDetailResponse.fromEntities(social, detail);
   }
 
-  @Transactional
-  public void joinSocial(final Long id) {
-    Account account = getAccount();
-    Social social =
-        socialRepository
-            .findById(id)
-            .orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
-
-    checkJoinCondition(social, account);
-    socialParticipantRepository.save(new SocialParticipant(social, account));
-  }
-
-  @Transactional
-  public void leaveSocial(final Long id) {
-    Account account = getAccount();
-    Social social =
-        socialRepository
-            .findById(id)
-            .orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
-
-    checkCancelCondition(social, account);
-    socialParticipantRepository.deleteAllBySocialIdAndAccountEntityId(
-        social.getId(), account.getEntityId());
-  }
-
-  private void checkJoinCondition(final Social social, final Account account) {
-    checkParticipantLimit(social);
-    checkDuplicateParticipation(social, account);
-  }
-
-  private void checkCancelCondition(final Social social, final Account account) {
-    checkGatheringDate(social);
-    checkParticipation(social, account);
-    checkRole(social, account);
-  }
-
-  private void checkParticipantLimit(final Social social) {
-    int maxCount = social.getMaxCount();
-    int current = social.getParticipants().size();
-    if (current >= maxCount) {
-      throw new CustomException(ErrorDetails.SOCIAL_EXCEED_MAX_LIMIT);
+  private List<Social> findAllSocials(final String filterBy, final String orderBy) {
+    LocalDateTime now = LocalDateTime.now();
+    if (filterBy.equals("open")) {
+      return socialRepository.findAllByGatheringDateAfterOrderByGatheringDateDesc(now);
     }
-  }
-
-  private void checkDuplicateParticipation(final Social social, final Account account) {
-    if (isParticipated(social, account)) {
-      throw new CustomException(ErrorDetails.SOCIAL_ALREADY_JOINED);
+    if (filterBy.equals("close")) {
+      return socialRepository.findAllByGatheringDateBeforeOrderByGatheringDateDesc(now);
     }
-  }
-
-  private void checkGatheringDate(final Social social) {
-    LocalDateTime gatheringDate = social.getGatheringDate();
-    if (gatheringDate.isBefore(LocalDateTime.now())) {
-      throw new CustomException(ErrorDetails.SOCIAL_ALREADY_PASSED);
+    if (filterBy.equals("cancel")) {
+      return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc();
     }
-  }
-
-  private void checkParticipation(final Social social, final Account account) {
-    if (!isParticipated(social, account)) {
-      throw new CustomException(ErrorDetails.SOCIAL_NOT_JOINED);
+    if (filterBy.equals("host")) {
+      return socialRepository.findAllOrderByPopularityDesc();
     }
-  }
-
-  private void checkRole(final Social social, Account account) {
-    if (social.getOwner().getEntityId().equals(account.getEntityId())) {
-      throw new CustomException(ErrorDetails.SOCIAL_OWNER_LEAVE_FORBIDDEN);
+    if (orderBy.equals("popularity")) {
+      return socialRepository.findAllOrderByPopularityDesc();
     }
-  }
-
-  private boolean isParticipated(final Social social, final Account account) {
-    return social.getParticipants().stream()
-        .anyMatch(
-            participant -> participant.getAccount().getEntityId().equals(account.getEntityId()));
+    return socialRepository.findAllByOrderByCreatedAtDesc();
   }
 
   private Account getAccount() {
