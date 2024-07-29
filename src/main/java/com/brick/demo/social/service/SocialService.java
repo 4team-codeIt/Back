@@ -109,22 +109,24 @@ public class SocialService {
 
   private List<Social> findAllSocials(final String filterBy, final String orderBy) {
     LocalDateTime now = LocalDateTime.now();
-    if (filterBy.equals("open")) {
-      return socialRepository.findAllByGatheringDateAfterOrderByGatheringDateDesc(now);
+    String filter = (filterBy == null) ? "" : filterBy;
+    String order = (orderBy == null) ? "" : orderBy;
+
+    switch (filter) {
+      case "open":
+        return socialRepository.findAllByGatheringDateAfterOrderByGatheringDateDesc(now);
+      case "close":
+        return socialRepository.findAllByGatheringDateBeforeOrderByGatheringDateDesc(now);
+      case "cancel":
+        return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc();
+      case "host":
+        return socialRepository.findAllOrderByPopularityDesc();
+      default:
+        if (order.equals("popularity")) {
+          return socialRepository.findAllOrderByPopularityDesc();
+        }
+        return socialRepository.findAllByOrderByCreatedAtDesc();
     }
-    if (filterBy.equals("close")) {
-      return socialRepository.findAllByGatheringDateBeforeOrderByGatheringDateDesc(now);
-    }
-    if (filterBy.equals("cancel")) {
-      return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc();
-    }
-    if (filterBy.equals("host")) {
-      return socialRepository.findAllOrderByPopularityDesc();
-    }
-    if (orderBy.equals("popularity")) {
-      return socialRepository.findAllOrderByPopularityDesc();
-    }
-    return socialRepository.findAllByOrderByCreatedAtDesc();
   }
 
   private Account getAccount() {
