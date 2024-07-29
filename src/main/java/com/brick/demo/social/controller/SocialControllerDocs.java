@@ -33,13 +33,13 @@ public interface SocialControllerDocs {
       @Schema(
               description = "모임 필터링 기준",
               pattern = "(open|close|cancel|host)?",
-              examples = {"open", "close", "cancel", "host"})
+              allowableValues = {"open", "close", "cancel", "host"})
           @RequestParam(required = false)
           final String filterBy,
       @Schema(
               description = "모임 정렬 기준",
               pattern = "(popularity)?",
-              examples = {"popularity"})
+              allowableValues = {"popularity"})
           @RequestParam(required = false)
           final String orderBy);
 
