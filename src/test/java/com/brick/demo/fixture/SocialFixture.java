@@ -14,18 +14,18 @@ public class SocialFixture {
   public static final LocalDateTime NOW = LocalDateTime.now();
   public static final LocalDateTime YESTERDAY = LocalDateTime.now().minusDays(1);
   public static final LocalDateTime TOMORROW = LocalDateTime.now().plusDays(1);
-  public static final LocalDateTime ONE_MONTH_AGO = LocalDateTime.now().minusMonths(1);
-  public static final LocalDateTime ONE_MONTH_LATER = LocalDateTime.now().plusMonths(1);
+  private static final LocalDateTime ONE_MONTH_AGO = LocalDateTime.now().minusMonths(1);
+  private static final LocalDateTime ONE_MONTH_LATER = LocalDateTime.now().plusMonths(1);
 
   public static final Place PLACE = new Place(ADDRESS, DETAIL_ADDRESS, LATITUDE, LONGITUDE);
   public static final ParticipantCount PARTICIPANT_COUNT = new ParticipantCount(2, 5);
 
-  public static final SocialCreateRequest TODAY_SOCIAL =
+  public static final SocialCreateRequest TODAY_SOCIAL_CREATE_REQUEST =
       new SocialCreateRequest("오늘 모임", "오늘 진행하는 모임입니다.", NOW, PARTICIPANT_COUNT, PLACE);
-  public static final SocialCreateRequest PAST_SOCIAL =
+  public static final SocialCreateRequest PAST_SOCIAL_CREATE_REQUEST =
       new SocialCreateRequest(
           "한달 전 모임", "한달 전에 진행했던 모임입니다.", ONE_MONTH_AGO, PARTICIPANT_COUNT, PLACE);
-  public static final SocialCreateRequest FUTURE_SOCIAL =
+  public static final SocialCreateRequest FUTURE_SOCIAL_CREATE_REQUEST =
       new SocialCreateRequest(
           "한달 후 모임", "한달 후에 진행할 모임입니다.", ONE_MONTH_LATER, PARTICIPANT_COUNT, PLACE);
 }

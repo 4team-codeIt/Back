@@ -2,7 +2,7 @@ package com.brick.demo.social.repository;
 
 import static com.brick.demo.fixture.AccountFixture.ACCOUNT;
 import static com.brick.demo.fixture.SocialFixture.PLACE;
-import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL;
+import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL_CREATE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.brick.demo.auth.repository.AccountRepository;
@@ -25,10 +25,10 @@ class SocialDetailRepositoryTest {
 
   @Test
   void 모임_아이디에_해당하는_모임_상세_정보를_조회한다() {
-    Social social = Social.save(accountRepository.save(ACCOUNT), TODAY_SOCIAL);
+    Social social = new Social(accountRepository.save(ACCOUNT), TODAY_SOCIAL_CREATE_REQUEST);
     socialRepository.save(social);
 
-    socialDetailRepository.save(SocialDetail.save(social, TODAY_SOCIAL));
+    socialDetailRepository.save(new SocialDetail(social, TODAY_SOCIAL_CREATE_REQUEST));
     SocialDetail detail = socialDetailRepository.findBySocialId(social.getId()).get();
 
     assertThat(detail.getGeoLocation()).isEqualTo(PLACE.latitude() + " " + PLACE.longitude());
