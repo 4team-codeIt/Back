@@ -9,8 +9,10 @@ import com.brick.demo.social.dto.QnaPatchRequestDto;
 import com.brick.demo.social.dto.QnaRequestDto;
 import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.entity.Qna;
+import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.repository.QnaCommentRepository;
 import com.brick.demo.social.repository.QnaRepository;
+import com.brick.demo.social.repository.SocialRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
@@ -32,13 +34,15 @@ public class QnaService {
 	private AccountManager accountManager;
 	private QnaRepository qnaRepository;
 	private QnaCommentRepository qnaCommentRepository;
+	private SocialRepository socialRepository;
 
 	@Autowired
 	QnaService(AccountManager accountManager, QnaRepository qnaRepository,
-			QnaCommentRepository qnaCommentRepository) {
+			QnaCommentRepository qnaCommentRepository, SocialRepository socialRepository) {
 		this.accountManager = accountManager;
 		this.qnaRepository = qnaRepository;
 		this.qnaCommentRepository = qnaCommentRepository;
+		this.socialRepository = socialRepository;
 	}
 
 	@Transactional
@@ -51,7 +55,9 @@ public class QnaService {
 			throw new CustomException(ErrorDetails.E001);
 		}
 		final Account account = accountOptional.get();
-		Qna qna = dto.toEntity(account, socialId);
+		final Social social = socialRepository.findById(socialId)
+				.orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
+		Qna qna = dto.toEntity(account, social);
 		qna = qnaRepository.save(qna);
 
 		return QnaResponseDto.builder().id(String.valueOf(qna.getId())).title(qna.getTitle())

@@ -49,7 +49,9 @@ public class QnaCommentService {
 			throw new CustomException(ErrorDetails.E001);
 		}
 		final Account account = accountOptional.get();
-		final Qna qna = qnaRepository.getOne(qnaId);
+		Qna qna = qnaRepository.findById(qnaId)
+				.orElseThrow(
+						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));
 		QnaComment qnaComment = dto.toEntity(qna, account);
 		qnaComment = qnaCommentRepository.save(qnaComment);
 

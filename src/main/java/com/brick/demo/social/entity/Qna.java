@@ -34,13 +34,9 @@ public class Qna {
 	@JoinColumn(name = "writer_id", nullable = false)
 	private Account writer;
 
-	@Column(name = "social_id", nullable = false)
-	private Long socialId;
-
-	// TODO: social 테이블 완료된 이후 아래 컬럼으로 대체
-//  @ManyToOne
-//  @JoinColumn(name = "social_id", nullable = false)
-//  private Social social;
+	@ManyToOne
+	@JoinColumn(name = "social_id", nullable = false)
+	private Social social;
 
 	@Column(length = 45, nullable = false)
 	private String title;
@@ -60,9 +56,9 @@ public class Qna {
 	private LocalDateTime deletedAt;
 
 	@Builder
-	public Qna(Account writer, Long socialId, String title, String content) {
+	public Qna(Account writer, Social social, String title, String content) {
 		this.writer = writer;
-		this.socialId = socialId; //TODO: social 테이블 완료된 이후 수정
+		this.social = social;
 		this.title = title;
 		this.content = content;
 	}

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/socials/{socialId}/qnas/{qnaId}/comments")
-public class QnaCommentController {
+public class QnaCommentController implements QnaCommentControllerDocs {
 
 	private final QnaCommentService qnaCommentService;
 

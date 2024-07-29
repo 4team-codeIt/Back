@@ -2,6 +2,7 @@ package com.brick.demo.social.dto;
 
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.social.entity.Qna;
+import com.brick.demo.social.entity.Social;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -21,10 +22,10 @@ public class QnaRequestDto {
 	@Size(max = 600, message = "내용은 600자를 넘을 수 없습니다")
 	private String content;
 
-	public Qna toEntity(Account writer, Long socialId) {
+	public Qna toEntity(Account writer, Social social) {
 		return Qna.builder()
 				.writer(writer)
-				.socialId(socialId)
+				.social(social)
 				.title(this.title)
 				.content(this.content)
 				.build();

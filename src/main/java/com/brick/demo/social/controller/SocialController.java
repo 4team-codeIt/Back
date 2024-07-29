@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SocialController implements SocialControllerDocs {
 
-  private final SocialService socialService;
+	private final SocialService socialService;
 
   @GetMapping
   public ResponseEntity<List<SocialResponse>> selectSocials(
@@ -39,24 +39,24 @@ public class SocialController implements SocialControllerDocs {
   public ResponseEntity<SocialResponse> selectSocialById(@PathVariable final Long id) {
     SocialResponse response = socialService.selectSocialById(id);
 
-    return ResponseEntity.ok(response);
-  }
+		return ResponseEntity.ok(response);
+	}
 
   @PostMapping
   public ResponseEntity<SocialCreateResponse> createSocial(
       @RequestBody @Valid final SocialCreateRequest dto) {
     SocialCreateResponse response = socialService.createSocial(dto);
 
-    return ResponseEntity.ok(response);
-  }
+		return ResponseEntity.ok(response);
+	}
 
   @PatchMapping("/{id}")
   public ResponseEntity<String> updateSocial(
       @PathVariable final Long id, @RequestBody @Valid final SocialUpdateRequest dto) {
     socialService.updateSocial(id, dto);
 
-    return ResponseEntity.ok("모임을 성공적으로 수정했습니다");
-  }
+		return ResponseEntity.ok("모임을 성공적으로 수정했습니다");
+	}
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> cancelSocial(@PathVariable final Long id) {
