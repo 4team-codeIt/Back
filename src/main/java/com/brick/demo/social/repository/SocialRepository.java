@@ -4,13 +4,23 @@ import com.brick.demo.social.entity.Social;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SocialRepository extends JpaRepository<Social, Long> {
+  List<Social> findAllByOrderByCreatedAtDesc();
+
   List<Social> findAllByOrderByGatheringDateDesc();
 
-  List<Social> findAllByGatheringDateBeforeOrderByGatheringDateDesc(LocalDateTime date);
+  List<Social> findAllByGatheringDateBeforeOrderByGatheringDateDesc(final LocalDateTime date);
 
-  List<Social> findAllByGatheringDateAfterOrderByGatheringDateDesc(LocalDateTime date);
+  List<Social> findAllByGatheringDateAfterOrderByGatheringDateDesc(final LocalDateTime date);
+
+  List<Social> findAllByCanceledTrueOrderByCreatedAtDesc();
+
+  List<Social> findAllByOwnerEntityIdOrderByCreatedAtDesc(final Long ownerEntityId);
+
+  @Query("SELECT s FROM Social s ORDER BY SIZE(s.participants) DESC")
+  List<Social> findAllOrderByPopularityDesc();
 }

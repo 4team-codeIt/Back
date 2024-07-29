@@ -1,7 +1,7 @@
 package com.brick.demo.social.repository;
 
 import static com.brick.demo.fixture.AccountFixture.ACCOUNT;
-import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL;
+import static com.brick.demo.fixture.SocialFixture.TODAY_SOCIAL_CREATE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.brick.demo.auth.entity.Account;
@@ -26,8 +26,7 @@ class SocialParticipantRepositoryTest {
   @Test
   void 모임_참여_이력을_찾아_모임_참가를_취소한다() {
     Account account = accountRepository.save(ACCOUNT);
-    Social social = Social.save(account, TODAY_SOCIAL);
-    socialRepository.save(social);
+    Social social = socialRepository.save(new Social(account, TODAY_SOCIAL_CREATE_REQUEST));
 
     SocialParticipant participant = new SocialParticipant(social, account);
     socialParticipantRepository.save(participant);

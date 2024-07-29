@@ -70,7 +70,7 @@ jobs:
           script: |
             sudo docker pull $DOCKER_USERNAME/$DOCKER_IMAGENAME
 
-            CONTAINER_ID=$(sudo docker ps --filter "name=$DOCKER_IMAGENAME" -q)
+            CONTAINER_ID=$(sudo docker ps --filter "name=$DOCKER_IMAGENAME" -qa)
             if [ -n "$CONTAINER_ID" ]; then
               sudo docker stop $CONTAINER_ID
               sudo docker rm $CONTAINER_ID
