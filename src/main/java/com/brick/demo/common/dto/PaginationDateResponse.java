@@ -1,4 +1,4 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.common.dto;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

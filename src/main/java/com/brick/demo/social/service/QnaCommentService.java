@@ -5,13 +5,10 @@ import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
-import com.brick.demo.common.ErrorDetails;
-import com.brick.demo.security.CustomUserDetails;
-import com.brick.demo.social.dto.PaginationIdResponse;
+import com.brick.demo.common.dto.PaginationIdResponse;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
-import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.QnaComment;
 import com.brick.demo.social.repository.QnaCommentRepository;
@@ -21,13 +18,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service

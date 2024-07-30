@@ -1,14 +1,12 @@
 package com.brick.demo.social.controller;
 
 
-import com.brick.demo.social.dto.PaginationDateResponse;
-import com.brick.demo.social.dto.PaginationIdResponse;
+import com.brick.demo.common.dto.PaginationDateResponse;
 import com.brick.demo.social.dto.QnaPatchRequestDto;
 import com.brick.demo.social.dto.QnaRequestDto;
 import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.service.QnaService;
 import jakarta.validation.Valid;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

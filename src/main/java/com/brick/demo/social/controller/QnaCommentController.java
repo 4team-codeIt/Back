@@ -1,17 +1,11 @@
 package com.brick.demo.social.controller;
 
-import com.brick.demo.social.dto.PaginationDateResponse;
-import com.brick.demo.social.dto.PaginationIdResponse;
+import com.brick.demo.common.dto.PaginationIdResponse;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
-import com.brick.demo.social.dto.QnaPatchRequestDto;
-import com.brick.demo.social.dto.QnaRequestDto;
-import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.service.QnaCommentService;
-import com.brick.demo.social.service.QnaService;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
