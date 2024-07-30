@@ -8,12 +8,11 @@ import lombok.Getter;
 @Getter
 public class DuplicateNameRequestDto {
 
-  @Email
-  @NotEmpty
-  private final String name;
+	@NotEmpty
+	private final String name;
 
-  @JsonCreator
-  public DuplicateNameRequestDto(String name) {
-    this.name = name;
-  }
+	@JsonCreator
+	public DuplicateNameRequestDto(String name) {
+		this.name = name;
+	}
 }
