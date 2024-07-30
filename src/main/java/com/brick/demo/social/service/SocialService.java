@@ -1,7 +1,7 @@
 package com.brick.demo.social.service;
 
 import com.brick.demo.auth.entity.Account;
-import com.brick.demo.auth.repository.AccountManager;
+import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.security.CustomUserDetails;
@@ -35,7 +35,7 @@ public class SocialService {
 	private final SocialRepository socialRepository;
 	private final SocialDetailRepository socialDetailRepository;
 	private final SocialParticipantRepository socialParticipantRepository;
-	private final AccountManager accountManager;
+	private final AccountRepository accountRepository;
 
 	@Transactional
 	public List<SocialResponse> selectSocials(final String filterBy, final String orderBy) {
@@ -69,11 +69,13 @@ public class SocialService {
 	@Transactional
 	public void updateSocial(final Long id, final SocialUpdateRequest dto) {
 		Account account = getAccount();
+
 		Social social =
 				socialRepository
 						.findById(id)
 						.orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
-
+		log.info("어스  이름:", account.getName());
+		log.info("소셜 작성자 이름:", social.getName());
 		if (!account.getName().equals(social.getOwner().getName())) {
 			throw new CustomException(ErrorDetails.SOCIAL_FORBIDDEN);
 		}
@@ -137,6 +139,6 @@ public class SocialService {
 		log.info("어스");
 		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 		String name = userDetails.getName();
-		return accountManager.getAccountByName(name).get();
+		return accountRepository.findByName(name).get();
 	}
 }

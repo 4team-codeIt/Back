@@ -1,50 +1,40 @@
 package com.brick.demo.social.service;
 
 import com.brick.demo.auth.entity.Account;
-import com.brick.demo.auth.repository.AccountManager;
+import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.security.CustomUserDetails;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
-import com.brick.demo.social.dto.QnaRequestDto;
-import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.QnaComment;
 import com.brick.demo.social.repository.QnaCommentRepository;
 import com.brick.demo.social.repository.QnaRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class QnaCommentService {
 
 	private final QnaCommentRepository qnaCommentRepository;
-	private final AccountManager accountManager;
+	private final AccountRepository accountRepository;
 	private final QnaRepository qnaRepository;
-
-	@Autowired
-	public QnaCommentService(QnaCommentRepository qnaCommentRepository,
-			AccountManager accountManager, QnaRepository qnaRepository) {
-		this.qnaCommentRepository = qnaCommentRepository;
-		this.accountManager = accountManager;
-		this.qnaRepository = qnaRepository;
-	}
 
 	@Transactional
 	public QnaCommentResponseDto create(Long qnaId, QnaCommentRequestDto dto) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 		final String writerName = userDetails.getName();
-		final Optional<Account> accountOptional = accountManager.getAccountByName(writerName);
+		final Optional<Account> accountOptional = accountRepository.findByName(writerName);
 		if (accountOptional.isEmpty()) {
 			throw new CustomException(ErrorDetails.E001);
 		}
