@@ -43,25 +43,7 @@ public class QnaService {
 	private final QnaRepository qnaRepository;
 	private final QnaCommentRepository qnaCommentRepository;
 	private final SocialRepository socialRepository;
-
-	public PaginationIdResponse getQnasBySocialId(Long socialId, Long cursor, int limit) {
-		PageRequest pageable = PageRequest.of(0, limit);
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put("social.id", socialId);
-
-		List<Qna> qnas = qnaRepository.findByCursorAndOrderByIdAsc(cursor, pageable, conditions);
-		boolean hasNext = qnas.size() > limit;
-		if (hasNext) {
-			qnas = qnas.subList(0, limit); // 필요한 만큼만 반환
-		}
-		List<QnaResponseDto> qnaResponseDtos = qnas.stream()
-				.map(qna -> new QnaResponseDto(qna, qna.getCommentCount()))
-				.collect(Collectors.toList());
-		Long nextCursor = hasNext ? qnas.get(limit - 1).getId() : null;
-		return new PaginationIdResponse(nextCursor, qnaResponseDtos);
-
-	}
-
+	
 	public PaginationDateResponse getQnasBySocialIdByCreatedAt(Long socialId, LocalDateTime cursor,
 			int limit) {
 		PageRequest pageable = PageRequest.of(0, limit);
@@ -71,9 +53,6 @@ public class QnaService {
 		List<Qna> qnas = qnaRepository.findByCursorAndOrderByCreatedAtDesc(cursor, pageable,
 				conditions);
 		boolean hasNext = qnas.size() > limit;
-		log.info("hasNext {}", hasNext);
-		log.info("qnas {}", qnas);
-		log.info("qnas 사이즈 {}", qnas.size());
 		if (hasNext) {
 			qnas = qnas.subList(0, limit); // 필요한 만큼만 반환
 		}

@@ -2,6 +2,7 @@ package com.brick.demo.social.controller;
 
 
 import com.brick.demo.social.dto.PaginationDateResponse;
+import com.brick.demo.social.dto.PaginationIdResponse;
 import com.brick.demo.social.dto.QnaPatchRequestDto;
 import com.brick.demo.social.dto.QnaRequestDto;
 import com.brick.demo.social.dto.QnaResponseDto;
@@ -35,18 +36,11 @@ public class QnaController implements QnaControllerDocs {
 		this.qnaService = qnaService;
 	}
 
-//	@GetMapping // qna id가 커서 (오래된순)
-//	public PaginationIdResponse getQnasBySocialIdOrderById(@PathVariable Long socialId,
-//			@RequestParam(value = "cursor", required = false) Long cursor,
-//			@RequestParam(value = "limit") int limit) {
-//		return qnaService.getQnasBySocialId(socialId, cursor, limit);
-//	}
-
 	@GetMapping // qna created_at이 커서 (최신순)
 	public PaginationDateResponse getQnasBySocialIdOrderByLocalDate(@PathVariable Long socialId,
 			@RequestParam(value = "cursor", required = false) LocalDateTime cursor,
 			@RequestParam(value = "limit") int limit) {
-		return qnaService.getQnasBySocialIdByUpdatedAt(socialId, cursor, limit);
+		return qnaService.getQnasBySocialIdByCreatedAt(socialId, cursor, limit);
 	}
 
 	@PostMapping
@@ -54,11 +48,6 @@ public class QnaController implements QnaControllerDocs {
 		log.info("디티오 : {}", dto);
 		return qnaService.create(socialId, dto);
 	}
-
-//  @GetMapping("/{qnaId}")
-//  public ResponseEntity<Qna> getQnaById(@PathVariable Long socialId, @PathVariable Long qnaId, Pageable pageable) {
-//    return ResponseEntity.ok(qnaService.getQnaWithComments(qnaId, pageable));
-//  }
 
 	@PatchMapping("/{qnaId}")
 	public QnaResponseDto update(@PathVariable Long qnaId,
