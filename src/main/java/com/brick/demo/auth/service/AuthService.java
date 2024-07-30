@@ -150,10 +150,10 @@ public class AuthService {
 							authenticationToken); //authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 실행됨.
 
 			//이미 로그인 했었는지 검사(재로그인, 토큰 재발급 방지)
-			Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
-			if (existingAccessToken.isPresent()) {
-				throw new CustomException(ErrorDetails.E004);
-			}
+//			Optional<AccessToken> existingAccessToken = accessTokenTokenManager.findByKey(dto.getEmail());
+//			if (existingAccessToken.isPresent()) {
+//				throw new CustomException(ErrorDetails.E004);
+//			}
 
 			//탈퇴한 회원인지 검사
 			final Optional<Account> accountOptional = accountManager.getAccountByEmail(dto.getEmail());
