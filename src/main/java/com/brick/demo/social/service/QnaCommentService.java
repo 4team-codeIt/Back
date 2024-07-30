@@ -1,5 +1,7 @@
 package com.brick.demo.social.service;
 
+import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
+
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
@@ -31,14 +33,7 @@ public class QnaCommentService {
 
 	@Transactional
 	public QnaCommentResponseDto create(Long qnaId, QnaCommentRequestDto dto) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		final String writerName = userDetails.getName();
-		final Optional<Account> accountOptional = accountRepository.findByName(writerName);
-		if (accountOptional.isEmpty()) {
-			throw new CustomException(ErrorDetails.E001);
-		}
-		final Account account = accountOptional.get();
+		Account account = getCurrentAccount(accountRepository);
 		Qna qna = qnaRepository.findById(qnaId)
 				.orElseThrow(
 						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));

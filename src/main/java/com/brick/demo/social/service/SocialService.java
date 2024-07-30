@@ -1,5 +1,7 @@
 package com.brick.demo.social.service;
 
+import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
+
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
@@ -56,7 +58,7 @@ public class SocialService {
 
 	@Transactional
 	public SocialCreateResponse createSocial(final SocialCreateRequest dto) {
-		Account account = getAccount();
+		Account account = getCurrentAccount(accountRepository);
 		Social social = socialRepository.save(new Social(account, dto));
 		SocialDetail detail = socialDetailRepository.save(new SocialDetail(social, dto));
 
@@ -68,8 +70,7 @@ public class SocialService {
 
 	@Transactional
 	public void updateSocial(final Long id, final SocialUpdateRequest dto) {
-		Account account = getAccount();
-
+		Account account = getCurrentAccount(accountRepository);
 		Social social =
 				socialRepository
 						.findById(id)
@@ -85,7 +86,7 @@ public class SocialService {
 
 	@Transactional
 	public void cancelSocial(Long id) {
-		Account account = getAccount();
+		Account account = getCurrentAccount(accountRepository);
 		Social social =
 				socialRepository
 						.findById(id)
@@ -132,13 +133,5 @@ public class SocialService {
 				}
 				return socialRepository.findAllByOrderByCreatedAtDesc();
 		}
-	}
-
-	private Account getAccount() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		log.info("어스");
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String name = userDetails.getName();
-		return accountRepository.findByName(name).get();
 	}
 }

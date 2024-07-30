@@ -1,5 +1,7 @@
 package com.brick.demo.auth.service;
 
+import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
+
 import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
 import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
 import com.brick.demo.auth.dto.DuplicateNameRequestDto;
@@ -52,14 +54,7 @@ public class AuthService {
 
 	@Transactional(readOnly = true)
 	public Optional<UserResponseDto> getAccountDetail() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-		final String writerName = userDetails.getName();
-		final Optional<Account> accountOptional = accountRepository.findByName(writerName);
-		if (accountOptional.isEmpty()) {
-			throw new CustomException(ErrorDetails.E001);
-		}
-		final Account account = accountOptional.get();
+		final Account account = getCurrentAccount(accountRepository);
 		return Optional.of(new UserResponseDto(account));
 	}
 
@@ -91,14 +86,7 @@ public class AuthService {
 
 	@Transactional
 	public UserResponseDto updateAccount(UserPatchRequestDto dto) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		final Optional<Account> accountOptional = accountRepository.findByEmail(email);
-		if (accountOptional.isEmpty()) {
-			throw new CustomException(ErrorDetails.E001);
-		}
-		final Account account = accountOptional.get();
-
+		final Account account = getCurrentAccount(accountRepository);
 		final LocalDate birthday =
 				(dto.getBirthday() != null) ? dto.getBirthday() : account.getBirthday();
 		final String introduce =
@@ -112,13 +100,7 @@ public class AuthService {
 
 	@Transactional
 	public void deleteAccount(HttpServletRequest request, HttpServletResponse response) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String email = authentication.getName();
-		final Optional<Account> accountOptional = accountRepository.findByEmail(email);
-		if (accountOptional.isEmpty()) {
-			throw new CustomException(ErrorDetails.E001);
-		}
-		final Account account = accountOptional.get();
+		final Account account = getCurrentAccount(accountRepository);
 		account.softDelete();
 		accountRepository.save(account);
 
