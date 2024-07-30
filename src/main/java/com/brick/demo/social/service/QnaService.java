@@ -43,14 +43,12 @@ public class QnaService {
 	private final QnaRepository qnaRepository;
 	private final QnaCommentRepository qnaCommentRepository;
 	private final SocialRepository socialRepository;
-	
+
 	public PaginationDateResponse getQnasBySocialIdByCreatedAt(Long socialId, LocalDateTime cursor,
 			int limit) {
-		PageRequest pageable = PageRequest.of(0, limit);
 		Map<String, Object> conditions = new HashMap<>();
 		conditions.put("social.id", socialId);
-
-		List<Qna> qnas = qnaRepository.findByCursorAndOrderByCreatedAtDesc(cursor, pageable,
+		List<Qna> qnas = qnaRepository.findByCursorAndOrderByCreatedAtDesc(cursor, limit,
 				conditions);
 		boolean hasNext = qnas.size() > limit;
 		if (hasNext) {

@@ -40,11 +40,9 @@ public class QnaCommentService {
 
 	@Transactional
 	public PaginationIdResponse getCommentsByQnaId(Long qnaId, Long cursor, int limit) {
-		PageRequest pageable = PageRequest.of(0, limit);
 		Map<String, Object> conditions = new HashMap<>();
 		conditions.put("qna.id", qnaId);
-
-		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByField(cursor, pageable,
+		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByField(cursor, limit,
 				conditions, "id", true);
 		boolean hasNext = comments.size() > limit;
 		if (hasNext) {

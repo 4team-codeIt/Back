@@ -2,7 +2,6 @@ package com.brick.demo.common.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.util.CollectionUtils;
@@ -44,9 +43,9 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 	}
 
 	private List<T> executeQuery(String jpql, Map<String, Object> conditions, Object cursor,
-			String cursorName, Pageable pageable) {
+			String cursorName, int limit) {
 		TypedQuery<T> query = entityManager.createQuery(jpql, getDomainClass())
-				.setMaxResults(pageable.getPageSize() + 1); // 하나 더 읽기
+				.setMaxResults(limit + 1); // 하나 더 읽기
 
 		setQueryParameters(query, conditions, cursor, cursorName);
 
@@ -55,7 +54,7 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 
 	@Override
 	//sortBy는 컬럼을 넣어야함.
-	public List<T> findByCursorAndOrderByField(ID cursor, Pageable pageable,
+	public List<T> findByCursorAndOrderByField(ID cursor, int limit,
 			Map<String, Object> conditions, String sortBy, boolean asc) {
 		String conditionString =
 				CollectionUtils.isEmpty(conditions) ? "" : " AND " + buildConditionString(conditions);
@@ -66,11 +65,11 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString
 						+ cursorCondition + " ORDER BY e." + orderBy;
 
-		return executeQuery(jpql, conditions, cursor, "cursor", pageable);
+		return executeQuery(jpql, conditions, cursor, "cursor", limit);
 	}
 
 	@Override
-	public List<T> findByCursorAndOrderByCreatedAtDesc(LocalDateTime cursor, Pageable pageable,
+	public List<T> findByCursorAndOrderByCreatedAtDesc(LocalDateTime cursor, int limit,
 			Map<String, Object> conditions) {
 		String conditionString =
 				CollectionUtils.isEmpty(conditions) ? "" : " AND " + buildConditionString(conditions);
@@ -79,6 +78,6 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString
 						+ cursorCondition + " ORDER BY e.createdAt DESC";
 
-		return executeQuery(jpql, conditions, cursor, "cursor", pageable);
+		return executeQuery(jpql, conditions, cursor, "cursor", limit);
 	}
 }
