@@ -44,8 +44,8 @@ public class QnaCommentService {
 		Map<String, Object> conditions = new HashMap<>();
 		conditions.put("qna.id", qnaId);
 
-		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByIdAsc(cursor, pageable,
-				conditions);
+		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByField(cursor, pageable,
+				conditions, "id", true);
 		boolean hasNext = comments.size() > limit;
 		if (hasNext) {
 			comments = comments.subList(0, limit); // 필요한 만큼만 반환

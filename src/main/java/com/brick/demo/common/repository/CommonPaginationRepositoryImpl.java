@@ -32,26 +32,41 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 		return conditionString.toString();
 	}
 
-	@Override
-	public List<T> findByCursorAndOrderByIdAsc(ID cursor, Pageable pageable,
-			Map<String, Object> conditions) {
-		String conditionString =
-				CollectionUtils.isEmpty(conditions) ? "" : " AND " + buildConditionString(conditions);
-		String cursorCondition = cursor == null ? "" : " AND e.id > :cursor";
-		String jpql =
-				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString +
-						cursorCondition + " ORDER BY e.id ASC";
-		TypedQuery<T> query = entityManager.createQuery(jpql, getDomainClass())
-				.setMaxResults(pageable.getPageSize() + 1); // 하나 더 읽기
-
+	private void setQueryParameters(TypedQuery<T> query, Map<String, Object> conditions,
+			Object cursor, String cursorName) {
 		if (cursor != null) {
-			query.setParameter("cursor", cursor);
+			query.setParameter(cursorName, cursor);
 		}
 		conditions.forEach((key, value) -> {
 			String paramName = key.replace(".", "_");
 			query.setParameter(paramName, value);
 		});
+	}
+
+	private List<T> executeQuery(String jpql, Map<String, Object> conditions, Object cursor,
+			String cursorName, Pageable pageable) {
+		TypedQuery<T> query = entityManager.createQuery(jpql, getDomainClass())
+				.setMaxResults(pageable.getPageSize() + 1); // 하나 더 읽기
+
+		setQueryParameters(query, conditions, cursor, cursorName);
+
 		return query.getResultList();
+	}
+
+	@Override
+	//sortBy는 컬럼을 넣어야함.
+	public List<T> findByCursorAndOrderByField(ID cursor, Pageable pageable,
+			Map<String, Object> conditions, String sortBy, boolean asc) {
+		String conditionString =
+				CollectionUtils.isEmpty(conditions) ? "" : " AND " + buildConditionString(conditions);
+		String cursorCondition = cursor == null ? "" : " AND e.id > :cursor";
+		String orderBy = sortBy + (asc ? " ASC" : " DESC");
+
+		String jpql =
+				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString
+						+ cursorCondition + " ORDER BY e." + orderBy;
+
+		return executeQuery(jpql, conditions, cursor, "cursor", pageable);
 	}
 
 	@Override
@@ -61,20 +76,9 @@ public class CommonPaginationRepositoryImpl<T, ID> extends SimpleJpaRepository<T
 				CollectionUtils.isEmpty(conditions) ? "" : " AND " + buildConditionString(conditions);
 		String cursorCondition = cursor == null ? "" : " AND e.createdAt < :cursor";
 		String jpql =
-				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString +
-						cursorCondition + " ORDER BY e.createdAt DESC";
-		TypedQuery<T> query = entityManager.createQuery(jpql, getDomainClass())
-				.setMaxResults(pageable.getPageSize() + 1); // 하나 더 읽기
+				"SELECT e FROM " + getDomainClass().getSimpleName() + " e WHERE (1=1) " + conditionString
+						+ cursorCondition + " ORDER BY e.createdAt DESC";
 
-		if (cursor != null) {
-			query.setParameter("cursor", cursor);
-		}
-		conditions.forEach((key, value) -> {
-			String paramName = key.replace(".", "_");
-			query.setParameter(paramName, value);
-		});
-
-		return query.getResultList();
+		return executeQuery(jpql, conditions, cursor, "cursor", pageable);
 	}
-
 }

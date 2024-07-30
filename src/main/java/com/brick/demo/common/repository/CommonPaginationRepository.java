@@ -10,7 +10,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface CommonPaginationRepository<T, ID> extends JpaRepository<T, ID> {
 
-	List<T> findByCursorAndOrderByIdAsc(ID cursor, Pageable pageable, Map<String, Object> conditions);
+	List<T> findByCursorAndOrderByField(ID cursor, Pageable pageable, Map<String, Object> conditions,
+			String sortBy, boolean asc);
 
 	List<T> findByCursorAndOrderByCreatedAtDesc(LocalDateTime cursor, Pageable pageable,
 			Map<String, Object> conditions);
