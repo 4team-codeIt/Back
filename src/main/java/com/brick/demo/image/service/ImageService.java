@@ -35,6 +35,7 @@ public class ImageService {
 	private String socialsFolder;
 
 	public PresignedUrlResponse createUserProfileImagePresignedUrl(ImageFileExtension fileExtension) {
+//		fileExtension.validate();
 		String fixedFileExtension = fileExtension.getUploadExtension();
 		String fileName = getFileNameInFolder(userProfileFolder, fixedFileExtension);
 		URL url = amazonS3.generatePresignedUrl(
@@ -44,6 +45,7 @@ public class ImageService {
 
 	public PresignedUrlResponse createSocialImagePresignedUrl(Long socialId,
 			ImageFileExtension fileExtension) {
+//		fileExtension.validate();
 		String fixedFileExtension = fileExtension.getUploadExtension();
 		String fileName = getFileNameInFolder(socialsFolder + socialId + "/", fixedFileExtension);
 		URL url = amazonS3.generatePresignedUrl(
