@@ -73,7 +73,7 @@ public record SocialDetailResponse(
 
 	private static List<Participant> makeParticipants(final Social social, final Participant owner) {
 		List<Participant> participants = social.getParticipants().stream()
-				.filter(participant -> !participant.getId().equals(social.getOwner().getEntityId()))
+				.filter(participant -> !participant.getAccount().getEntityId().equals(social.getOwner().getEntityId()))
 				.map(participant -> new Participant(
 						participant.getAccount().getEntityId(),
 						participant.getAccount().getName(),
