@@ -1,6 +1,7 @@
 package com.brick.demo.auth.jwt;
 
 import com.brick.demo.auth.dto.TokenDto;
+import com.brick.demo.common.CustomException;
 import com.brick.demo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,6 +16,7 @@ import java.util.Collections;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -76,15 +78,14 @@ public class TokenProvider {
 			Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
 			return true;
 		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-			log.info("잘못된 JWT 서명입니다.");
+			throw new CustomException(HttpStatus.UNAUTHORIZED, "잘못된 JWT 서명입니다.");
 		} catch (ExpiredJwtException e) {
-			log.info("만료된 JWT 토큰입니다.");
+			throw new CustomException(HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다.");
 		} catch (UnsupportedJwtException e) {
-			log.info("지원되지 않는 JWT 토큰입니다.");
+			throw new CustomException(HttpStatus.UNAUTHORIZED, "지원되지 않는 JWT 토큰입니다.");
 		} catch (IllegalArgumentException e) {
-			log.info("JWT 토큰이 잘못되었습니다.");
+			throw new CustomException(HttpStatus.UNAUTHORIZED, "JWT 토큰이 잘못되었습니다.");
 		}
-		return false;
 	}
 
 	private Claims parseClaims(String accessToken) {

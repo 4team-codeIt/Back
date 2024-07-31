@@ -13,67 +13,69 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record SocialDetailResponse(
-    @Schema(description = "모임 아이디", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull Long id,
+		@Schema(description = "모임 아이디", requiredMode = Schema.RequiredMode.REQUIRED)
+		@NotNull Long id,
 
-    @Schema(description = "모임 이름", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty String name,
+		@Schema(description = "모임 이름", requiredMode = Schema.RequiredMode.REQUIRED)
+		@NotEmpty String name,
 
-    @Schema(description = "모임 소개", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty String description,
+		@Schema(description = "모임 소개", requiredMode = Schema.RequiredMode.REQUIRED)
+		@NotEmpty String description,
 
-    @Schema(description = "모임 일정", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotEmpty LocalDateTime gatheringDate,
+		@Schema(description = "모임 일정", requiredMode = Schema.RequiredMode.REQUIRED)
+		@NotEmpty LocalDateTime gatheringDate,
 
-    @Schema(description = "모임 정원", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Valid ParticipantCount participantCount,
+		@Schema(description = "모임 정원", requiredMode = Schema.RequiredMode.REQUIRED)
+		@Valid ParticipantCount participantCount,
 
-    @Schema(description = "이미지 URL 배열")
-    String[] imageUrls,
+		@Schema(description = "이미지 URL 배열")
+		String[] imageUrls,
 
-    @Schema(description = "활동비", requiredMode = RequiredMode.NOT_REQUIRED)
-    Integer dues,
+		@Schema(description = "활동비", requiredMode = RequiredMode.NOT_REQUIRED)
+		Integer dues,
 
-    @Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-    String[] tags,
+		@Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
+		String[] tags,
 
-    @Schema(description = "주최자", requiredMode = RequiredMode.REQUIRED)
-    @Valid Participant owner,
+		@Schema(description = "주최자", requiredMode = RequiredMode.REQUIRED)
+		@Valid Participant owner,
 
-    @Schema(description = "참여자", requiredMode = RequiredMode.REQUIRED)
-    @Valid Participant[] participants
+		@Schema(description = "참여자", requiredMode = RequiredMode.REQUIRED)
+		@Valid List<Participant> participants
 ) {
-    public static SocialDetailResponse fromEntities(final Social social, final SocialDetail detail) {
-        ParticipantCount participantCount =
-            new ParticipantCount(
-                social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-        Participant owner = new Participant(social.getOwner().getName(), "TODO", ParticipantRole.OWNER.name());
-        Participant[] participants = makeParticipants(social, owner);
+	public static SocialDetailResponse fromEntities(final Social social, final SocialDetail detail) {
+		ParticipantCount participantCount =
+				new ParticipantCount(
+						social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-        return new SocialDetailResponse(
-            social.getId(),
-            social.getName(),
-            detail.getDescription(),
-            social.getGatheringDate(),
-            participantCount,
-            social.getImageUrls().split(","),
-            social.getDues(),
-            social.getTags().split(","),
-            owner,
-            participants
-        );
-    }
+		Participant owner = new Participant(social.getOwner().getName(), "TODO",
+				ParticipantRole.OWNER.name());
+		List<Participant> participants = makeParticipants(social, owner);
 
-    private static Participant[] makeParticipants(final Social social, final Participant owner) {
-        List<Participant> participants = social.getParticipants().stream()
-            .filter(participant -> !participant.getId().equals(social.getOwner().getEntityId()))
-            .map(participant -> new Participant(
-                participant.getAccount().getName(),
-                "TODO",
-                ParticipantRole.PARTICIPANT.name()
-            )).collect(Collectors.toList());
-        participants.add(owner);
-        return (Participant[]) participants.toArray();
-    }
+		return new SocialDetailResponse(
+				social.getId(),
+				social.getName(),
+				detail.getDescription(),
+				social.getGatheringDate(),
+				participantCount,
+				social.getImageUrls().split(","),
+				social.getDues(),
+				social.getTags().split(","),
+				owner,
+				participants
+		);
+	}
+
+	private static List<Participant> makeParticipants(final Social social, final Participant owner) {
+		List<Participant> participants = social.getParticipants().stream()
+				.filter(participant -> !participant.getId().equals(social.getOwner().getEntityId()))
+				.map(participant -> new Participant(
+						participant.getAccount().getName(),
+						"TODO",
+						ParticipantRole.PARTICIPANT.name()
+				)).collect(Collectors.toList());
+		participants.add(owner);
+		return participants;
+	}
 }

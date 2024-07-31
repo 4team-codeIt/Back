@@ -1,7 +1,9 @@
 package com.brick.demo.social.service;
 
+import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
+
 import com.brick.demo.auth.entity.Account;
-import com.brick.demo.auth.repository.AccountManager;
+import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.security.CustomUserDetails;
@@ -35,7 +37,7 @@ public class SocialService {
 	private final SocialRepository socialRepository;
 	private final SocialDetailRepository socialDetailRepository;
 	private final SocialParticipantRepository socialParticipantRepository;
-	private final AccountManager accountManager;
+	private final AccountRepository accountRepository;
 
 	@Transactional
 	public List<SocialResponse> selectSocials(final String filterBy, final String orderBy) {
@@ -56,7 +58,7 @@ public class SocialService {
 
 	@Transactional
 	public SocialCreateResponse createSocial(final SocialCreateRequest dto) {
-		Account account = getAccount();
+		Account account = getCurrentAccount(accountRepository);
 		Social social = socialRepository.save(new Social(account, dto));
 		SocialDetail detail = socialDetailRepository.save(new SocialDetail(social, dto));
 
@@ -68,12 +70,13 @@ public class SocialService {
 
 	@Transactional
 	public void updateSocial(final Long id, final SocialUpdateRequest dto) {
-		Account account = getAccount();
+		Account account = getCurrentAccount(accountRepository);
 		Social social =
 				socialRepository
 						.findById(id)
 						.orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
-
+		log.info("어스  이름:", account.getName());
+		log.info("소셜 작성자 이름:", social.getName());
 		if (!account.getName().equals(social.getOwner().getName())) {
 			throw new CustomException(ErrorDetails.SOCIAL_FORBIDDEN);
 		}
@@ -83,7 +86,7 @@ public class SocialService {
 
 	@Transactional
 	public void cancelSocial(Long id) {
-		Account account = getAccount();
+		Account account = getCurrentAccount(accountRepository);
 		Social social =
 				socialRepository
 						.findById(id)
@@ -130,13 +133,5 @@ public class SocialService {
 				}
 				return socialRepository.findAllByOrderByCreatedAtDesc();
 		}
-	}
-
-	private Account getAccount() {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		log.info("어스");
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String name = userDetails.getName();
-		return accountManager.getAccountByName(name).get();
 	}
 }

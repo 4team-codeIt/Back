@@ -39,10 +39,12 @@ public class WebSecurityConfig {
 			Map.of("url", "/socials/*/qnas/*/comments/*", "method", "GET")
 	);
 
+	//POST, PATCH, PUT, DELETE 메서드에서 요구됨. 해당 메서드로 요청 시 여기에 허용 안해주면 jwt 필터까지 가지도 못하고 403 에러 발생
 	private final List<String> excludeUrlsCsrf =
 			List.of(
 					"/auth/users",
 					"/socials",
+					"/socials/*",
 					"/socials/*/qnas",
 					"/socials/*/qnas/*",
 					"/socials/*/qnas/*/comments",
@@ -76,7 +78,7 @@ public class WebSecurityConfig {
 											.permitAll();
 								}
 							});
-							authorize.anyRequest().authenticated();
+							authorize.anyRequest().permitAll();
 						})
 				.formLogin(form -> form.disable())
 				.csrf(
