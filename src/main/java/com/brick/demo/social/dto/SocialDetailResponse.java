@@ -29,13 +29,13 @@ public record SocialDetailResponse(
 		@Valid ParticipantCount participantCount,
 
 		@Schema(description = "이미지 URL 배열")
-		String[] imageUrls,
+		List<String> imageUrls,
 
 		@Schema(description = "활동비", requiredMode = RequiredMode.NOT_REQUIRED)
 		Integer dues,
 
 		@Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-		String[] tags,
+		List<String> tags,
 
 		@Schema(description = "주최자", requiredMode = RequiredMode.REQUIRED)
 		@Valid Participant owner,
@@ -49,7 +49,7 @@ public record SocialDetailResponse(
 				new ParticipantCount(
 						social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-		Participant owner = new Participant(social.getOwner().getName(), "TODO",
+		Participant owner = new Participant(social.getOwner().getEntityId(), social.getOwner().getName(), "TODO",
 				ParticipantRole.OWNER.name());
 		List<Participant> participants = makeParticipants(social, owner);
 
@@ -59,9 +59,9 @@ public record SocialDetailResponse(
 				detail.getDescription(),
 				social.getGatheringDate(),
 				participantCount,
-				social.getImageUrls().split(","),
+				List.of(social.getImageUrls().split(",")),
 				social.getDues(),
-				social.getTags().split(","),
+				List.of(social.getTags().split(",")),
 				owner,
 				participants
 		);
@@ -71,6 +71,7 @@ public record SocialDetailResponse(
 		List<Participant> participants = social.getParticipants().stream()
 				.filter(participant -> !participant.getId().equals(social.getOwner().getEntityId()))
 				.map(participant -> new Participant(
+						participant.getAccount().getEntityId(),
 						participant.getAccount().getName(),
 						"TODO",
 						ParticipantRole.PARTICIPANT.name()

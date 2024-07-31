@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 
 public record SocialDetailIntroductionResponse (
     @Schema(description = "모임 소개", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -13,6 +14,6 @@ public record SocialDetailIntroductionResponse (
     @Valid Place place,
 
     @Schema(description = "참여자", requiredMode = RequiredMode.REQUIRED)
-    @Valid Participant[] participants
+    @Valid List<String> participants
 ) {
 }
