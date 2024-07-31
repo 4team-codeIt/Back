@@ -46,7 +46,8 @@ public record SocialResponse(
             social.getOwner().getEntityId(),
             social.getOwner().getName(),
             "TODO 프로필 URL",
-            ParticipantRole.OWNER.name());
+            ParticipantRole.OWNER.name(),
+            social.getOwner().getIntroduce());
 
         return new SocialResponse(
             social.getId(),

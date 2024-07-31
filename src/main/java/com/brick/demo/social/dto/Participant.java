@@ -16,6 +16,9 @@ public record Participant(
     String profileUrl,
 
     @Schema(description = "모임 참가자의 역할")
-    String role
+    String role,
+
+    @Schema(description = "모임 참가자의 한 줄 소개")
+    String description
 ) {
 }

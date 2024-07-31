@@ -49,8 +49,12 @@ public record SocialDetailResponse(
 				new ParticipantCount(
 						social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-		Participant owner = new Participant(social.getOwner().getEntityId(), social.getOwner().getName(), "TODO",
-				ParticipantRole.OWNER.name());
+		Participant owner = new Participant(
+				social.getOwner().getEntityId(),
+				social.getOwner().getName(),
+				"TODO",
+				ParticipantRole.OWNER.name(),
+				social.getOwner().getIntroduce());
 		List<Participant> participants = makeParticipants(social, owner);
 
 		return new SocialDetailResponse(
@@ -74,7 +78,8 @@ public record SocialDetailResponse(
 						participant.getAccount().getEntityId(),
 						participant.getAccount().getName(),
 						"TODO",
-						ParticipantRole.PARTICIPANT.name()
+						ParticipantRole.PARTICIPANT.name(),
+						participant.getAccount().getIntroduce()
 				)).collect(Collectors.toList());
 		participants.add(owner);
 		return participants;
