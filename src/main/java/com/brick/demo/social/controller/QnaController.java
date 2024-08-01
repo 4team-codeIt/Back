@@ -8,9 +8,12 @@ import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.service.QnaService;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,11 +37,18 @@ public class QnaController implements QnaControllerDocs {
 		this.qnaService = qnaService;
 	}
 
-	@GetMapping // qna created_at이 커서 (최신순)
-	public PaginationDateResponse getQnasBySocialIdOrderByLocalDate(@PathVariable Long socialId,
-			@RequestParam(value = "cursor", required = false) LocalDateTime cursor,
-			@RequestParam(value = "limit") int limit) {
-		return qnaService.getQnasBySocialIdByCreatedAt(socialId, cursor, limit);
+//	@GetMapping // qna created_at이 커서 (최신순) - 커서기반
+//	public PaginationDateResponse getQnasBySocialIdOrderByLocalDate(@PathVariable Long socialId,
+//			@RequestParam(value = "cursor", required = false) LocalDateTime cursor,
+//			@RequestParam(value = "limit") int limit) {
+//		return qnaService.getQnasBySocialIdByCreatedAt(socialId, cursor, limit);
+//	}
+
+	@GetMapping//오프셋 기반 페이지네이션
+	public ResponseEntity<List<QnaResponseDto>> getQnasBySocialIdOrderByLocalDate(
+			@PathVariable Long socialId,
+			@ParameterObject Pageable pageable) {
+		return qnaService.getQnasBySocialIdByCreatedAt(socialId, pageable);
 	}
 
 	@PostMapping
