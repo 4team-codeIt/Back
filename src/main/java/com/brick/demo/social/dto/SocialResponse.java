@@ -53,7 +53,7 @@ public record SocialResponse(
             social.getId(),
             social.getName(),
             social.getGatheringDate(),
-            social.getAddress(),
+            social.getAddress().replace(",", " "),
             participantCount,
             thumbnail,
             List.of(social.getTags().split(",")),
