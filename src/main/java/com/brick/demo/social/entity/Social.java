@@ -83,7 +83,7 @@ public class Social extends BaseEntity {
   private Set<SocialParticipant> participants = new HashSet<>();
 
   public Social(final Account account, final SocialCreateRequest dto) {
-    String address = dto.place().address() + ' ' + dto.place().detailAddress();
+    String address = dto.place().address() + "," + dto.place().detailAddress();
     String imageUrls = dto.imageUrls() == null ? null : String.join(",", dto.imageUrls());
     String tags = dto.tags() == null ? null : String.join(",", dto.tags());
 
@@ -99,7 +99,7 @@ public class Social extends BaseEntity {
   }
 
   public void update(final SocialUpdateRequest dto) {
-    this.address = dto.place().address() + ' ' + dto.place().detailAddress();
+    this.address = dto.place().address() + "," + dto.place().detailAddress();
     this.imageUrls = String.join(",", dto.imageUrls());
   }
 
