@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record SocialCreateRequest(
 		@Schema(description = "모임 이름", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -24,13 +25,13 @@ public record SocialCreateRequest(
 		@Valid Place place,
 
 		@Schema(description = "이미지 URL 배열")
-		String[] imageUrls,
+		List<String> imageUrls,
 
 		@Schema(description = "활동비", requiredMode = RequiredMode.NOT_REQUIRED)
 		Integer dues,
 
 		@Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-		String[] tags
+		List<String> tags
 ) {
 	
     public SocialCreateRequest(final String name, final String description, final LocalDateTime gatheringDate, final ParticipantCount participantCount, final Place place) {

@@ -29,13 +29,13 @@ public record SocialDetailResponse(
 		@Valid ParticipantCount participantCount,
 
 		@Schema(description = "이미지 URL 배열")
-		String[] imageUrls,
+		List<String> imageUrls,
 
 		@Schema(description = "활동비", requiredMode = RequiredMode.NOT_REQUIRED)
 		Integer dues,
 
 		@Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-		String[] tags,
+		List<String> tags,
 
 		@Schema(description = "주최자", requiredMode = RequiredMode.REQUIRED)
 		@Valid Participant owner,
@@ -49,8 +49,12 @@ public record SocialDetailResponse(
 				new ParticipantCount(
 						social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-		Participant owner = new Participant(social.getOwner().getName(), "TODO",
-				ParticipantRole.OWNER.name());
+		Participant owner = new Participant(
+				social.getOwner().getEntityId(),
+				social.getOwner().getName(),
+				"TODO",
+				ParticipantRole.OWNER.name(),
+				social.getOwner().getIntroduce());
 		List<Participant> participants = makeParticipants(social, owner);
 
 		return new SocialDetailResponse(
@@ -59,9 +63,9 @@ public record SocialDetailResponse(
 				detail.getDescription(),
 				social.getGatheringDate(),
 				participantCount,
-				social.getImageUrls().split(","),
+				List.of(social.getImageUrls().split(",")),
 				social.getDues(),
-				social.getTags().split(","),
+				List.of(social.getTags().split(",")),
 				owner,
 				participants
 		);
@@ -69,11 +73,13 @@ public record SocialDetailResponse(
 
 	private static List<Participant> makeParticipants(final Social social, final Participant owner) {
 		List<Participant> participants = social.getParticipants().stream()
-				.filter(participant -> !participant.getId().equals(social.getOwner().getEntityId()))
+				.filter(participant -> !participant.getAccount().getEntityId().equals(social.getOwner().getEntityId()))
 				.map(participant -> new Participant(
+						participant.getAccount().getEntityId(),
 						participant.getAccount().getName(),
 						"TODO",
-						ParticipantRole.PARTICIPANT.name()
+						ParticipantRole.PARTICIPANT.name(),
+						participant.getAccount().getIntroduce()
 				)).collect(Collectors.toList());
 		participants.add(owner);
 		return participants;

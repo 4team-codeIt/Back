@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record SocialResponse(
     @Schema(description = "모임 아이디", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -28,7 +29,7 @@ public record SocialResponse(
     String thumbnail,
 
     @Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-    String[] tags,
+    List<String> tags,
 
     @Schema(description = "주최자", requiredMode = Schema.RequiredMode.REQUIRED)
     @Valid Participant owner
@@ -42,9 +43,11 @@ public record SocialResponse(
         String thumbnail = social.getImageUrls().split(",")[0];
 
         Participant owner = new Participant(
+            social.getOwner().getEntityId(),
             social.getOwner().getName(),
             "TODO 프로필 URL",
-            ParticipantRole.OWNER.name());
+            ParticipantRole.OWNER.name(),
+            social.getOwner().getIntroduce());
 
         return new SocialResponse(
             social.getId(),
@@ -53,7 +56,7 @@ public record SocialResponse(
             social.getAddress(),
             participantCount,
             thumbnail,
-            social.getTags().split(","),
+            List.of(social.getTags().split(",")),
             owner
         );
     }

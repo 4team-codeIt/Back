@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record JoinedSocialResponse(
     @Schema(description = "모임 아이디", requiredMode = Schema.RequiredMode.REQUIRED)
@@ -30,12 +31,12 @@ public record JoinedSocialResponse(
     String thumbnail,
 
     @Schema(description = "태그", requiredMode = Schema.RequiredMode.REQUIRED)
-    String[] tags,
+    List<String> tags,
 
     @Schema(description = "주최자", requiredMode = RequiredMode.REQUIRED)
     @Valid Participant owner,
 
     @Schema(description = "참여자", requiredMode = RequiredMode.REQUIRED)
-    @Valid Participant[] participants
+    @Valid List<Participant> participants
 ) {
 }
