@@ -26,11 +26,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialController implements SocialControllerDocs {
 
   private final SocialService socialService;
+  //
+  //  @GetMapping
+  //  public ResponseEntity<List<SocialResponse>> selectSocials(
+  //      @RequestParam(required = false) final String filterBy,
+  //      @RequestParam(required = false) final String orderBy,
+  //      @RequestParam(required = false) final List<Long> ids) {
+  //    List<SocialResponse> response = socialService.selectSocials(filterBy, orderBy, ids);
+  //
+  //    return ResponseEntity.ok(response);
+  //  }
 
   @GetMapping
   public ResponseEntity<List<SocialResponse>> selectSocials(
       @RequestParam(required = false) final String filterBy,
-      @RequestParam(required = false) @Valid String orderBy) {
+      @RequestParam(required = false) final String orderBy) {
     List<SocialResponse> response = socialService.selectSocials(filterBy, orderBy);
 
     return ResponseEntity.ok(response);

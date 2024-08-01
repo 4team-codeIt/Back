@@ -26,6 +26,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "모임", description = "모임 조회, 수정, 취소와 관련된 그룹입니다.")
 public interface SocialControllerDocs {
 
+  //  @Operation(summary = "모임 전체 조회", description = "전체 모임을 조회합니다.")
+  //  @ApiResponse(responseCode = "200")
+  //  @GetMapping
+  //  ResponseEntity<List<SocialResponse>> selectSocials(
+  //      @Schema(
+  //              description = "모임 필터링 기준",
+  //              pattern = "(open|close|cancel|host)?",
+  //              allowableValues = {"open", "close", "cancel", "host"},
+  //              requiredMode = RequiredMode.NOT_REQUIRED)
+  //          @RequestParam(required = false)
+  //          final String filterBy,
+  //      @Schema(
+  //              description = "모임 정렬 기준",
+  //              pattern = "(popularity)?",
+  //              allowableValues = {"popularity"},
+  //              requiredMode = RequiredMode.NOT_REQUIRED)
+  //          @RequestParam(required = false)
+  //          final String orderBy,
+  //      @Schema(description = "찜한 모임 아이디 목록", requiredMode = RequiredMode.NOT_REQUIRED)
+  //          @RequestParam(required = false)
+  //          final List<Long> ids);
+
   @Operation(summary = "모임 전체 조회", description = "전체 모임을 조회합니다.")
   @ApiResponse(responseCode = "200")
   @GetMapping
@@ -33,13 +55,15 @@ public interface SocialControllerDocs {
       @Schema(
               description = "모임 필터링 기준",
               pattern = "(open|close|cancel|host)?",
-              allowableValues = {"open", "close", "cancel", "host"})
+              allowableValues = {"open", "close", "cancel"},
+              requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(required = false)
           final String filterBy,
       @Schema(
               description = "모임 정렬 기준",
               pattern = "(popularity)?",
-              allowableValues = {"popularity"})
+              allowableValues = {"popularity"},
+              requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(required = false)
           final String orderBy);
 
