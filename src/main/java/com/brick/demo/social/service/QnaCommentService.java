@@ -59,11 +59,12 @@ public class QnaCommentService {
 			Pageable pageable) {
 		socialRepository.findById(socialId).orElseThrow(
 				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
-		qnaRepository.findById(qnaId)
+		qnaRepository.findByIdAndDeletedAtIsNull(qnaId)
 				.orElseThrow(
 						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));
 
-		Page<QnaComment> qnaCommentPage = qnaCommentRepository.findByQnaIdOrderByCreatedAtAsc(qnaId,
+		Page<QnaComment> qnaCommentPage = qnaCommentRepository.findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(
+				qnaId,
 				pageable);
 
 		List<QnaCommentResponseDto> qnaCommentResponseDtos = qnaCommentPage.getContent().stream()

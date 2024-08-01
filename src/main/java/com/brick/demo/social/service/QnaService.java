@@ -62,8 +62,8 @@ public class QnaService {
 			Pageable pageable) {
 		socialRepository.findById(socialId).orElseThrow(
 				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
-		
-		Page<Qna> qnaPage = qnaRepository.findBySocialIdOrderByCreatedAtDesc(socialId, pageable);
+
+		Page<Qna> qnaPage = qnaRepository.findBySocialIdAndDeletedAtIsNull(socialId, pageable);
 
 		List<QnaResponseDto> qnaResponseDtos = qnaPage.getContent().stream()
 				.map(qna -> new QnaResponseDto(qna, qna.getCommentCount()))
