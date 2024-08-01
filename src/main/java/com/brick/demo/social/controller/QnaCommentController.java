@@ -6,7 +6,10 @@ import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
 import com.brick.demo.social.service.QnaCommentService;
 import jakarta.validation.Valid;
+import java.util.List;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +32,18 @@ public class QnaCommentController implements QnaCommentControllerDocs {
 		this.qnaCommentService = qnaCommentService;
 	}
 
-	@GetMapping // qna id가 커서 (오래된순)
-	public PaginationIdResponse getCommentsByQnaId(@PathVariable Long socialId,
-			@PathVariable Long qnaId,
-			@RequestParam(value = "cursor", required = false) Long cursor,
-			@RequestParam(value = "limit") int limit) {
-		return qnaCommentService.getCommentsByQnaId(qnaId, cursor, limit);
+//	@GetMapping // qna id가 커서 (오래된순) - 커서기반
+//	public PaginationIdResponse getCommentsByQnaId(@PathVariable Long socialId,
+//			@PathVariable Long qnaId,
+//			@RequestParam(value = "cursor", required = false) Long cursor,
+//			@RequestParam(value = "limit") int limit) {
+//		return qnaCommentService.getCommentsByQnaId(qnaId, cursor, limit);
+//	}
+
+	@GetMapping // 오프셋 기반 페이지네이션
+	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(@PathVariable Long socialId,
+			@PathVariable Long qnaId, @ParameterObject Pageable pageable) {
+		return qnaCommentService.getCommentsByQnaId(socialId, qnaId, pageable);
 	}
 
 	@PostMapping

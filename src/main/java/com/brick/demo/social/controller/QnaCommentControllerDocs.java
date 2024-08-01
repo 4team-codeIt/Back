@@ -4,14 +4,19 @@ import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +35,16 @@ public interface QnaCommentControllerDocs {
 	@PostMapping
 	QnaCommentResponseDto create(@PathVariable Long socialId, @PathVariable Long qnaId,
 			@Valid @RequestBody QnaCommentRequestDto dto);
+
+	@Operation(summary = "Qna 댓글 목록 조회", description = "특정 Qna의 댓글 목록을 생성일 오름차순으로 페이지네이션하여 조회합니다.")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Qna 댓글 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = QnaCommentResponseDto.class)))),
+			@ApiResponse(responseCode = "404", description = "해당하는 Qna ID의 Qna를 찾을 수 없습니다", content = @Content(schema = @Schema(hidden = true))),
+			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
+	})
+	@GetMapping("/qnas/{socialId}/{qnaId}/comments")
+	ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(
+			@PathVariable Long socialId, @PathVariable Long qnaId, @ParameterObject Pageable pageable);
 
 	@Operation(summary = "Qna 댓글 수정", description = "특정 Qna의 댓글을 수정합니다.")
 	@ApiResponses({

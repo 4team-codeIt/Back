@@ -9,10 +9,13 @@ import com.brick.demo.common.dto.PaginationIdResponse;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
+import com.brick.demo.social.dto.QnaResponseDto;
 import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.QnaComment;
 import com.brick.demo.social.repository.QnaCommentRepository;
 import com.brick.demo.social.repository.QnaRepository;
+import com.brick.demo.social.repository.SocialRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,7 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,22 +36,40 @@ public class QnaCommentService {
 	private final QnaCommentRepository qnaCommentRepository;
 	private final AccountRepository accountRepository;
 	private final QnaRepository qnaRepository;
+	private final SocialRepository socialRepository;
 
-	@Transactional
-	public PaginationIdResponse getCommentsByQnaId(Long qnaId, Long cursor, int limit) {
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put("qna.id", qnaId);
-		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByField(cursor, limit,
-				conditions, "id", true);
-		boolean hasNext = comments.size() > limit;
-		if (hasNext) {
-			comments = comments.subList(0, limit); // 필요한 만큼만 반환
-		}
-		List<QnaCommentResponseDto> commentResponseDtos = comments.stream()
+//	@Transactional
+//	public PaginationIdResponse getCommentsByQnaId(Long qnaId, Long cursor, int limit) {
+//		Map<String, Object> conditions = new HashMap<>();
+//		conditions.put("qna.id", qnaId);
+//		List<QnaComment> comments = qnaCommentRepository.findByCursorAndOrderByField(cursor, limit,
+//				conditions, "id", true);
+//		boolean hasNext = comments.size() > limit;
+//		if (hasNext) {
+//			comments = comments.subList(0, limit); // 필요한 만큼만 반환
+//		}
+//		List<QnaCommentResponseDto> commentResponseDtos = comments.stream()
+//				.map(QnaCommentResponseDto::new)
+//				.collect(Collectors.toList());
+//		Long nextCursor = hasNext ? comments.get(limit - 1).getId() : null;
+//		return new PaginationIdResponse(nextCursor, commentResponseDtos);
+//	}
+
+	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(Long socialId, Long qnaId,
+			Pageable pageable) {
+		socialRepository.findById(socialId).orElseThrow(
+				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
+		qnaRepository.findById(qnaId)
+				.orElseThrow(
+						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));
+
+		Page<QnaComment> qnaCommentPage = qnaCommentRepository.findByQnaIdOrderByCreatedAtAsc(qnaId,
+				pageable);
+
+		List<QnaCommentResponseDto> qnaCommentResponseDtos = qnaCommentPage.getContent().stream()
 				.map(QnaCommentResponseDto::new)
 				.collect(Collectors.toList());
-		Long nextCursor = hasNext ? comments.get(limit - 1).getId() : null;
-		return new PaginationIdResponse(nextCursor, commentResponseDtos);
+		return new ResponseEntity<>(qnaCommentResponseDtos, HttpStatus.OK);
 	}
 
 	@Transactional
