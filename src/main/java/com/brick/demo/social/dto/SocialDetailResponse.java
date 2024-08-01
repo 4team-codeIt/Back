@@ -41,7 +41,10 @@ public record SocialDetailResponse(
 		@Valid Participant owner,
 
 		@Schema(description = "참여자", requiredMode = RequiredMode.REQUIRED)
-		@Valid List<Participant> participants
+		@Valid List<Participant> participants,
+
+		@Schema(description = "모임 소개 세부 정보", requiredMode = RequiredMode.REQUIRED)
+		@Valid SocialIntroduction introduction
 ) {
 
 	public static SocialDetailResponse fromEntities(final Social social, final SocialDetail detail) {
@@ -57,6 +60,11 @@ public record SocialDetailResponse(
 				social.getOwner().getIntroduce());
 		List<Participant> participants = makeParticipants(social, owner);
 
+		SocialIntroduction introduction = SocialIntroduction.fromEntities(
+				social.getAddress(),
+				detail
+		);
+
 		return new SocialDetailResponse(
 				social.getId(),
 				social.getName(),
@@ -67,7 +75,8 @@ public record SocialDetailResponse(
 				social.getDues(),
 				List.of(social.getTags().split(",")),
 				owner,
-				participants
+				participants,
+				introduction
 		);
 	}
 
