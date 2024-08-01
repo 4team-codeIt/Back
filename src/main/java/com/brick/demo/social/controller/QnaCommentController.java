@@ -30,27 +30,30 @@ public class QnaCommentController implements QnaCommentControllerDocs {
 	}
 
 	@GetMapping // qna id가 커서 (오래된순)
-	public PaginationIdResponse getCommentsByQnaId(@PathVariable Long qnaId,
+	public PaginationIdResponse getCommentsByQnaId(@PathVariable Long socialId,
+			@PathVariable Long qnaId,
 			@RequestParam(value = "cursor", required = false) Long cursor,
 			@RequestParam(value = "limit") int limit) {
 		return qnaCommentService.getCommentsByQnaId(qnaId, cursor, limit);
 	}
 
 	@PostMapping
-	public QnaCommentResponseDto create(@PathVariable Long qnaId,
+	public QnaCommentResponseDto create(@PathVariable Long socialId, @PathVariable Long qnaId,
 			@Valid @RequestBody QnaCommentRequestDto dto) {
 		return qnaCommentService.create(qnaId, dto);
 	}
 
 	@PatchMapping("/{commentId}")
-	public QnaCommentResponseDto update(@PathVariable Long commentId,
+	public QnaCommentResponseDto update(@PathVariable Long socialId, @PathVariable Long qnaId,
+			@PathVariable Long commentId,
 			@Valid @RequestBody
 			QnaCommentPatchDto dto) {
 		return qnaCommentService.update(commentId, dto);
 	}
 
 	@DeleteMapping("/{commentId}")
-	public ResponseEntity<Void> delete(@PathVariable Long commentId) {
+	public ResponseEntity<Void> delete(@PathVariable Long socialId, @PathVariable Long qnaId,
+			@PathVariable Long commentId) {
 		qnaCommentService.delete(commentId);
 		return ResponseEntity.noContent().build();
 	}

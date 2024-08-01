@@ -48,14 +48,14 @@ public class QnaController implements QnaControllerDocs {
 	}
 
 	@PatchMapping("/{qnaId}")
-	public QnaResponseDto update(@PathVariable Long qnaId,
+	public QnaResponseDto update(@PathVariable Long socialId, @PathVariable Long qnaId,
 			@Valid @RequestBody
 			QnaPatchRequestDto dto) {
 		return qnaService.update(qnaId, dto);
 	}
 
 	@DeleteMapping("/{qnaId}")
-	public ResponseEntity<Void> delete(@PathVariable Long qnaId) {
+	public ResponseEntity<Void> delete(@PathVariable Long socialId, @PathVariable Long qnaId) {
 		qnaService.delete(qnaId);
 		return ResponseEntity.noContent().build();
 	}
