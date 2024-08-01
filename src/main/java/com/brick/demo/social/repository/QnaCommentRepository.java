@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface QnaCommentRepository extends CommonPaginationRepository<QnaComment, Long> {
 
-	Page<QnaComment> findByQnaIdOrderByCreatedAtAsc(Long qnaId, Pageable pageable);
+	Page<QnaComment> findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(Long qnaId, Pageable pageable);
+
 
 }
