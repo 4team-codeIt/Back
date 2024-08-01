@@ -26,8 +26,8 @@ import org.springframework.stereotype.Component;
 public class TokenProvider {
 
 	public static final String BEARER_TYPE = "Bearer";
-	//  public static final String HEADER_STRING = "Authorization";
-	private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 30;            // 30분
+	private static final long ACCESS_TOKEN_EXPIRE_TIME =
+			1000 * 60 * 60 * 12; // 12시간 //TODO : 30분으로 바꾸기
 	private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7; //7일
 
 	private final Key key;
