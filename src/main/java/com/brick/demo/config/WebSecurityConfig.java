@@ -43,8 +43,10 @@ public class WebSecurityConfig {
 	private final List<String> excludeUrlsCsrf =
 			List.of(
 					"/auth/users",
+					"/auth/users/images",
 					"/socials",
 					"/socials/*",
+					"/socials/*/images",
 					"/socials/*/qnas",
 					"/socials/*/qnas/*",
 					"/socials/*/qnas/*/comments",
