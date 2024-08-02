@@ -38,17 +38,33 @@ public class SocialController implements SocialControllerDocs {
   //  }
 
   @GetMapping
-  public ResponseEntity<List<SocialResponse>> selectSocials(
+  public ResponseEntity<List<SocialResponse>> getSocials(
+      @RequestParam(defaultValue = "0") final int offset,
+      @RequestParam(defaultValue = "30") final int limit,
+      @RequestParam(required = false) final String filterBy,
+
+      @RequestParam(required = false) final String orderBy,
+      @RequestParam(required = false) final List<Long> ids) {
+    List<SocialResponse> response = socialService.getSocials(offset, limit, filterBy, orderBy, ids);
+
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<List<SocialResponse>> getMySocials(
+      @RequestParam(defaultValue = "0") final int offset,
+      @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy) {
-    List<SocialResponse> response = socialService.selectSocials(filterBy, orderBy);
+    List<SocialResponse> response = socialService.getMySocials(offset, limit, filterBy, orderBy);
+
 
     return ResponseEntity.ok(response);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<SocialResponse> selectSocialById(@PathVariable final Long id) {
-    SocialResponse response = socialService.selectSocialById(id);
+  public ResponseEntity<SocialResponse> getSocialById(@PathVariable final Long id) {
+    SocialResponse response = socialService.getSocialById(id);
 
     return ResponseEntity.ok(response);
   }
@@ -77,8 +93,8 @@ public class SocialController implements SocialControllerDocs {
   }
 
   @GetMapping("/{id}/details")
-  public ResponseEntity<SocialDetailResponse> selectDetailBySocialId(@PathVariable final Long id) {
-    SocialDetailResponse response = socialService.selectDetailBySocialId(id);
+  public ResponseEntity<SocialDetailResponse> getDetailBySocialId(@PathVariable final Long id) {
+    SocialDetailResponse response = socialService.getDetailBySocialId(id);
 
     return ResponseEntity.ok(response);
   }

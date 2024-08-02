@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +40,34 @@ public class SocialService {
   private final AccountRepository accountRepository;
 
   @Transactional
-  public List<SocialResponse> selectSocials(final String filterBy, final String orderBy) {
-    return findAllSocials(filterBy, orderBy).stream()
+  public List<SocialResponse> getSocials(
+      final int offset,
+      final int limit,
+      final String filterBy,
+      final String orderBy,
+      final List<Long> ids) {
+    Pageable pageable = PageRequest.of(offset, limit);
+
+    Page<Social> socials =
+        ids.isEmpty()
+            ? findAllSocials(filterBy, orderBy, pageable)
+            : findAllSocialsByIdList(filterBy, orderBy, ids, pageable);
+
+    return socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList());
+  }
+
+  @Transactional
+  public List<SocialResponse> getMySocials(
+      final int offset, final int limit, final String filterBy, String orderBy) {
+    Pageable pageable = PageRequest.of(offset, limit);
+
+    return findAllMySocials(filterBy, orderBy, pageable).stream()
         .map(SocialResponse::fromEntity)
         .collect(Collectors.toList());
   }
 
   @Transactional
-  public SocialResponse selectSocialById(Long id) throws CustomException {
+  public SocialResponse getSocialById(Long id) throws CustomException {
     Social social =
         socialRepository
             .findById(id)
@@ -75,8 +98,10 @@ public class SocialService {
     if (!account.getName().equals(social.getOwner().getName())) {
       throw new CustomException(ErrorDetails.SOCIAL_FORBIDDEN);
     }
+    SocialDetail detail = socialDetailRepository.findBySocialId(id).get();
 
     social.update(dto);
+    detail.update(dto);
   }
 
   @Transactional
@@ -95,7 +120,7 @@ public class SocialService {
   }
 
   @Transactional
-  public SocialDetailResponse selectDetailBySocialId(final Long id) {
+  public SocialDetailResponse getDetailBySocialId(final Long id) {
     Social social =
         socialRepository
             .findById(id)
@@ -108,50 +133,70 @@ public class SocialService {
     return SocialDetailResponse.fromEntities(social, detail);
   }
 
-  private List<Social> findAllSocials(final String filterBy, final String orderBy) {
+  private Page<Social> findAllSocials(
+      final String filterBy, final String orderBy, Pageable pageable) {
     LocalDateTime now = LocalDateTime.now();
     String filter = (filterBy == null) ? "" : filterBy;
     String order = (orderBy == null) ? "" : orderBy;
 
-    // TODO
     switch (filter) {
       case "open":
-        return socialRepository.findAllByGatheringDateAfterOrderByCreatedAtDesc(now);
+        return socialRepository.findAllByGatheringDateAfterOrderByCreatedAtDesc(now, pageable);
       case "close":
-        return socialRepository.findAllByGatheringDateBeforeOrderByCreatedAtDesc(now);
+        return socialRepository.findAllByGatheringDateBeforeOrderByCreatedAtDesc(now, pageable);
       case "cancel":
-        return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc();
-        // TODO 호스트는 API 다르게 가져가야 함
-        //      case "host":
-        //        return socialRepository.findAllByOrderByPopularityDesc();
+        return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc(pageable);
       default:
         if (order.equals("popularity")) {
-          return socialRepository.findAllByOrderByPopularityDesc();
+          return socialRepository.findAllByOrderByPopularityDesc(pageable);
         }
-        return socialRepository.findAllByOrderByCreatedAtDesc();
+        return socialRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
   }
 
-  //  private List<Social> findAllSocialsByIdList(
-  //      final String filterBy, final String orderBy, final List<Long> ids) {
-  //    LocalDateTime now = LocalDateTime.now();
-  //    String filter = (filterBy == null) ? "" : filterBy;
-  //    String order = (orderBy == null) ? "" : orderBy;
-  //
-  //    switch (filter) {
-  //      case "open":
-  //        return socialRepository.findAllByIdInAndGatheringDateAfterOrderByCreatedAtDesc(ids,
-  // now);
-  //      case "close":
-  //        return socialRepository.findAllByIdInAndGatheringDateBeforeOrderByCreatedAtDesc(ids,
-  // now);
-  //      case "cancel":
-  //        // TODO 추후 고려
-  //      default:
-  //        if (order.equals("popularity")) {
-  //          return socialRepository.findAllByOrderByPopularityDesc();
-  //        }
-  //        return socialRepository.findAllByIdInOrderByCreatedAtDesc(ids);
-  //    }
-  //  }
+  private Page<Social> findAllSocialsByIdList(
+      final String filterBy, final String orderBy, final List<Long> ids, Pageable pageable) {
+    LocalDateTime now = LocalDateTime.now();
+    String filter = (filterBy == null) ? "" : filterBy;
+    String order = (orderBy == null) ? "" : orderBy;
+
+    switch (filter) {
+      case "open":
+        return socialRepository.findAllByIdInAndGatheringDateAfterOrderByCreatedAtDesc(
+            ids, now, pageable);
+      case "close":
+        return socialRepository.findAllByIdInAndGatheringDateBeforeOrderByCreatedAtDesc(
+            ids, now, pageable);
+      default:
+        if (order.equals("popularity")) {
+          return socialRepository.findAllByIdInOrderByPopularityDesc(ids, pageable);
+        }
+        return socialRepository.findAllByIdInOrderByCreatedAtDesc(ids, pageable);
+    }
+  }
+
+  private Page<Social> findAllMySocials(
+      final String filterBy, final String orderBy, Pageable pageable) {
+    Account account = getCurrentAccount(accountRepository);
+    Long ownerEntityId = account.getEntityId();
+
+    LocalDateTime now = LocalDateTime.now();
+    String filter = (filterBy == null) ? "" : filterBy;
+    String order = (orderBy == null) ? "" : orderBy;
+
+    switch (filter) {
+      case "open":
+        return socialRepository.findAllByOwnerEntityIdAndGatheringDateAfterOrderByCreatedAtDesc(
+            ownerEntityId, now, pageable);
+      case "close":
+        return socialRepository.findAllByOwnerEntityIdAndGatheringDateBeforeOrderByCreatedAtDesc(
+            ownerEntityId, now, pageable);
+      default:
+        if (order.equals("popularity")) {
+          return socialRepository.findAllByOwnerEntityIdOrderByPopularityDesc(
+              ownerEntityId, pageable);
+        }
+        return socialRepository.findAllByOwnerEntityIdOrderByCreatedAtDesc(ownerEntityId, pageable);
+    }
+  }
 }

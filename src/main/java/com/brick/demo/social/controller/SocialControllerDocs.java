@@ -51,10 +51,18 @@ public interface SocialControllerDocs {
   @Operation(summary = "모임 전체 조회", description = "전체 모임을 조회합니다.")
   @ApiResponse(responseCode = "200")
   @GetMapping
-  ResponseEntity<List<SocialResponse>> selectSocials(
+  ResponseEntity<List<SocialResponse>> getSocials(
+      @Schema(description = "offset", example = "0", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(defaultValue = "0")
+          final int offset,
+      @Schema(description = "limit", example = "30", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(defaultValue = "30")
+          final int limit,
       @Schema(
               description = "모임 필터링 기준",
-              pattern = "(open|close|cancel|host)?",
+
+              pattern = "(open|close|cancel)?",
+
               allowableValues = {"open", "close", "cancel"},
               requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(required = false)
@@ -64,6 +72,42 @@ public interface SocialControllerDocs {
               pattern = "(popularity)?",
               allowableValues = {"popularity"},
               requiredMode = RequiredMode.NOT_REQUIRED)
+
+          @RequestParam(required = false)
+          final String orderBy,
+      @Schema(
+              description = "찜한 모임 아이디 목록",
+              example = "1,2,3",
+              requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(required = false)
+          final List<Long> ids);
+
+  @Operation(summary = "내가 생성한 모임 조회", description = "내가 생성한 모임을 조회합니다.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200"),
+    @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true)))
+  })
+  @GetMapping("/me")
+  ResponseEntity<List<SocialResponse>> getMySocials(
+      @Schema(description = "offset", example = "0", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(defaultValue = "0")
+          final int offset,
+      @Schema(description = "limit", example = "30", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(defaultValue = "30")
+          final int limit,
+      @Schema(
+              description = "모임 필터링 기준",
+              pattern = "(open|close|cancel)?",
+              allowableValues = {"open", "close", "cancel"},
+              requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(required = false)
+          final String filterBy,
+      @Schema(
+              description = "모임 정렬 기준",
+              pattern = "(popularity)?",
+              allowableValues = {"popularity"},
+              requiredMode = RequiredMode.NOT_REQUIRED)
+
           @RequestParam(required = false)
           final String orderBy);
 
@@ -76,7 +120,7 @@ public interface SocialControllerDocs {
         content = @Content(schema = @Schema(hidden = true)))
   })
   @GetMapping("/{id}")
-  ResponseEntity<SocialResponse> selectSocialById(
+  ResponseEntity<SocialResponse> getSocialById(
       @Schema(description = "조회하려는 모임 아이디", requiredMode = RequiredMode.REQUIRED) @PathVariable
           final Long id);
 
@@ -126,7 +170,7 @@ public interface SocialControllerDocs {
   @Operation(summary = "모임 상세 정보 조회", description = "모임의 상세 정보를 조회합니다.")
   @ApiResponse(responseCode = "200")
   @GetMapping("/{id}/details")
-  ResponseEntity<SocialDetailResponse> selectDetailBySocialId(
+  ResponseEntity<SocialDetailResponse> getDetailBySocialId(
       @Schema(description = "상세 정보 조회하려는 모임 아이디", requiredMode = RequiredMode.REQUIRED)
           @PathVariable
           final Long id);
