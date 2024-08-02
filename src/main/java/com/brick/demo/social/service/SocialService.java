@@ -49,7 +49,7 @@ public class SocialService {
     Pageable pageable = PageRequest.of(offset, limit);
 
     Page<Social> socials =
-        ids.isEmpty()
+        ids == null
             ? findAllSocials(filterBy, orderBy, pageable)
             : findAllSocialsByIdList(filterBy, orderBy, ids, pageable);
 
