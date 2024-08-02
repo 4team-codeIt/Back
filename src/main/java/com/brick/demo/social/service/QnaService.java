@@ -25,7 +25,10 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,22 +41,37 @@ public class QnaService {
 	private final QnaCommentRepository qnaCommentRepository;
 	private final SocialRepository socialRepository;
 
-	public PaginationDateResponse getQnasBySocialIdByCreatedAt(Long socialId, LocalDateTime cursor,
-			int limit) {
-		Map<String, Object> conditions = new HashMap<>();
-		conditions.put("social.id", socialId);
-		List<Qna> qnas = qnaRepository.findByCursorAndOrderByCreatedAtDesc(cursor, limit,
-				conditions);
-		boolean hasNext = qnas.size() > limit;
-		if (hasNext) {
-			qnas = qnas.subList(0, limit); // 필요한 만큼만 반환
-		}
-		List<QnaResponseDto> qnaResponseDtos = qnas.stream()
+//	public PaginationDateResponse getQnasBySocialIdByCreatedAt(Long socialId, LocalDateTime cursor,
+//			int limit) {
+//		Map<String, Object> conditions = new HashMap<>();
+//		conditions.put("social.id", socialId);
+//		List<Qna> qnas = qnaRepository.findByCursorAndOrderByCreatedAtDesc(cursor, limit,
+//				conditions);
+//		boolean hasNext = qnas.size() > limit;
+//		if (hasNext) {
+//			qnas = qnas.subList(0, limit); // 필요한 만큼만 반환
+//		}
+//		List<QnaResponseDto> qnaResponseDtos = qnas.stream()
+//				.map(qna -> new QnaResponseDto(qna, qna.getCommentCount()))
+//				.collect(Collectors.toList());
+//		LocalDateTime nextCursor = hasNext ? qnas.get(limit - 1).getCreatedAt() : null;
+//		return new PaginationDateResponse(nextCursor, qnaResponseDtos);
+//	}
+
+	public ResponseEntity<List<QnaResponseDto>> getQnasBySocialIdByCreatedAt(Long socialId,
+			Pageable pageable) {
+		socialRepository.findById(socialId).orElseThrow(
+				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
+
+		Page<Qna> qnaPage = qnaRepository.findBySocialIdAndDeletedAtIsNull(socialId, pageable);
+
+		List<QnaResponseDto> qnaResponseDtos = qnaPage.getContent().stream()
 				.map(qna -> new QnaResponseDto(qna, qna.getCommentCount()))
 				.collect(Collectors.toList());
-		LocalDateTime nextCursor = hasNext ? qnas.get(limit - 1).getCreatedAt() : null;
-		return new PaginationDateResponse(nextCursor, qnaResponseDtos);
+
+		return new ResponseEntity<>(qnaResponseDtos, HttpStatus.OK);
 	}
+
 
 	@Transactional
 	public QnaResponseDto create(Long socialId, @Valid QnaRequestDto dto) {
