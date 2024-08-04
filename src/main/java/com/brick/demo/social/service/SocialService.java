@@ -20,7 +20,6 @@ import com.brick.demo.social.repository.SocialParticipantRepository;
 import com.brick.demo.social.repository.SocialRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,14 +48,12 @@ public class SocialService {
       final List<Long> ids) {
     Pageable pageable = PageRequest.of(offset, limit);
 
-    Page<Social> socials =
+    Page<Social> pages =
         ids == null
             ? findAllSocials(filterBy, orderBy, pageable)
             : findAllSocialsByIdList(filterBy, orderBy, ids, pageable);
 
-    return new SocialResponses(
-        socials.getTotalElements(),
-        socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList()));
+    return SocialResponses.from(pages);
   }
 
   @Transactional
@@ -64,11 +61,7 @@ public class SocialService {
       final int offset, final int limit, final String filterBy, String orderBy) {
     Pageable pageable = PageRequest.of(offset, limit);
 
-    Page<Social> socials = findAllMySocials(filterBy, orderBy, pageable);
-
-    return new SocialResponses(
-        socials.getTotalElements(),
-        socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList()));
+    return SocialResponses.from(findAllMySocials(filterBy, orderBy, pageable));
   }
 
   @Transactional
