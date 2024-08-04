@@ -83,7 +83,6 @@ public class SocialService {
     SocialDetail detail = socialDetailRepository.save(new SocialDetail(social, dto));
 
     socialParticipantRepository.save(new SocialParticipant(social, account));
-    social.updateDetail(detail);
 
     return new SocialCreateResponse(social.getId(), "모임을 성공적으로 생성하였습니다.");
   }
