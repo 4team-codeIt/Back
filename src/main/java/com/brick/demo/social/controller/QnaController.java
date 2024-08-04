@@ -2,6 +2,7 @@ package com.brick.demo.social.controller;
 
 
 import com.brick.demo.common.dto.PaginationDateResponse;
+import com.brick.demo.social.dto.QnaPageResponse;
 import com.brick.demo.social.dto.QnaPatchRequestDto;
 import com.brick.demo.social.dto.QnaRequestDto;
 import com.brick.demo.social.dto.QnaResponseDto;
@@ -45,7 +46,7 @@ public class QnaController implements QnaControllerDocs {
 //	}
 
 	@GetMapping//오프셋 기반 페이지네이션
-	public ResponseEntity<List<QnaResponseDto>> getQnasBySocialIdOrderByLocalDate(
+	public QnaPageResponse getQnasBySocialIdOrderByLocalDate(
 			@PathVariable Long socialId,
 			@ParameterObject Pageable pageable) {
 		return qnaService.getQnasBySocialIdByCreatedAt(socialId, pageable);

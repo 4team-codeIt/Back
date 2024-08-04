@@ -32,7 +32,7 @@ public class QnaResponseDto {
 		this.writerName = qna.getWriter().getName();
 		this.commentCount = comments.size();
 		this.createdAt = qna.getCreatedAt();
-		this.updatedAt = updatedAt; // save한 후 get으로 가져온 값을 넣어줘야 함
+		this.updatedAt = updatedAt;
 	}
 
 	public QnaResponseDto(Qna qna, int commentCount) {

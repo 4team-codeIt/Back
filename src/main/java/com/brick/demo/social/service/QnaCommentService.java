@@ -6,6 +6,7 @@ import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.dto.PaginationIdResponse;
+import com.brick.demo.social.dto.QnaCommentPageResponse;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
@@ -55,7 +56,7 @@ public class QnaCommentService {
 //		return new PaginationIdResponse(nextCursor, commentResponseDtos);
 //	}
 
-	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(Long socialId, Long qnaId,
+	public QnaCommentPageResponse getCommentsByQnaId(Long socialId, Long qnaId,
 			Pageable pageable) {
 		socialRepository.findById(socialId).orElseThrow(
 				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
@@ -66,11 +67,7 @@ public class QnaCommentService {
 		Page<QnaComment> qnaCommentPage = qnaCommentRepository.findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(
 				qnaId,
 				pageable);
-
-		List<QnaCommentResponseDto> qnaCommentResponseDtos = qnaCommentPage.getContent().stream()
-				.map(QnaCommentResponseDto::new)
-				.collect(Collectors.toList());
-		return new ResponseEntity<>(qnaCommentResponseDtos, HttpStatus.OK);
+		return QnaCommentPageResponse.from(qnaCommentPage);
 	}
 
 	@Transactional

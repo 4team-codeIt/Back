@@ -1,6 +1,7 @@
 package com.brick.demo.social.controller;
 
 import com.brick.demo.common.dto.PaginationIdResponse;
+import com.brick.demo.social.dto.QnaCommentPageResponse;
 import com.brick.demo.social.dto.QnaCommentPatchDto;
 import com.brick.demo.social.dto.QnaCommentRequestDto;
 import com.brick.demo.social.dto.QnaCommentResponseDto;
@@ -41,7 +42,7 @@ public class QnaCommentController implements QnaCommentControllerDocs {
 //	}
 
 	@GetMapping // 오프셋 기반 페이지네이션
-	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(@PathVariable Long socialId,
+	public QnaCommentPageResponse getCommentsByQnaId(@PathVariable Long socialId,
 			@PathVariable Long qnaId, @ParameterObject Pageable pageable) {
 		return qnaCommentService.getCommentsByQnaId(socialId, qnaId, pageable);
 	}

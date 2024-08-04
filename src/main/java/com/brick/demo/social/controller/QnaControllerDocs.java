@@ -1,5 +1,6 @@
 package com.brick.demo.social.controller;
 
+import com.brick.demo.social.dto.QnaPageResponse;
 import com.brick.demo.social.dto.QnaPatchRequestDto;
 import com.brick.demo.social.dto.QnaRequestDto;
 import com.brick.demo.social.dto.QnaResponseDto;
@@ -38,12 +39,12 @@ public interface QnaControllerDocs {
 
 	@Operation(summary = "Qna 목록 조회", description = "특정 social의 Qna 목록을 생성일 내림차순으로 페이지네이션하여 조회합니다.")
 	@ApiResponses({
-			@ApiResponse(responseCode = "200", description = "Qna 목록 조회 성공", content = @Content(array = @ArraySchema(schema = @Schema(implementation = QnaResponseDto.class)))),
+			@ApiResponse(responseCode = "200"),
 			@ApiResponse(responseCode = "404", description = "해당하는 social ID의 모임을 찾을 수 없습니다", content = @Content(schema = @Schema(hidden = true))),
 			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
 	})
-	@GetMapping("/qnas/{socialId}")
-	ResponseEntity<List<QnaResponseDto>> getQnasBySocialIdOrderByLocalDate(
+	@GetMapping
+	QnaPageResponse getQnasBySocialIdOrderByLocalDate(
 			@PathVariable Long socialId, @ParameterObject Pageable pageable);
 
 	@Operation(summary = "Qna 수정", description = "특정 social의 Qna를 수정합니다.")
