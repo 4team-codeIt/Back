@@ -26,7 +26,7 @@ public record SocialResponses(
             page.getTotalElements(),
             page.getTotalPages(),
             page.getNumber(),
-            page.stream().map(SocialResponse::fromEntity).collect(Collectors.toList())
+            page.stream().map(SocialResponse::from).collect(Collectors.toList())
         );
     }
 }

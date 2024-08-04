@@ -13,12 +13,7 @@ public record SocialIntroduction(
     @Valid Place place
 ) {
 
-    public static SocialIntroduction fromEntities(final String fullAddress, final SocialDetail detail) {
-        String[] addresses = fullAddress.split(",");
-        String[] geoLocations = detail.getGeoLocation().split(" ");
-
-        Place place = new Place(addresses[0], addresses[1], Double.parseDouble(geoLocations[0]), Double.parseDouble(geoLocations[1]));
-
-        return new SocialIntroduction(detail.getDescription(), place);
+    public static SocialIntroduction from(final String fullAddress, final SocialDetail detail) {
+        return new SocialIntroduction(detail.getDescription(), Place.from(fullAddress, detail.getGeoLocation()));
     }
 }

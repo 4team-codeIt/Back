@@ -1,8 +1,10 @@
 package com.brick.demo.social.entity;
 
 import com.brick.demo.common.entity.BaseEntity;
+import com.brick.demo.social.dto.Place;
 import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialUpdateRequest;
+import com.brick.demo.social.enums.Delimiter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,11 +50,15 @@ public class SocialDetail extends BaseEntity {
   public SocialDetail(final Social social, final SocialCreateRequest dto) {
     this.social = social;
     this.description = dto.description();
-    this.geoLocation = dto.place().latitude() + " " + dto.place().longitude();
+    this.geoLocation = geoLocationFrom(dto.place());
   }
 
   public void update(final SocialUpdateRequest dto) {
     this.description = dto.description();
-    this.geoLocation = dto.place().latitude() + " " + dto.place().longitude();
+    this.geoLocation = geoLocationFrom(dto.place());
+  }
+
+  private static String geoLocationFrom(final Place place) {
+    return place.latitude() + Delimiter.GEOLOCATION.value() + place.longitude();
   }
 }

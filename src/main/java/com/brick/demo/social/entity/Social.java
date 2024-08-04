@@ -2,8 +2,10 @@ package com.brick.demo.social.entity;
 
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.common.entity.BaseEntity;
+import com.brick.demo.social.dto.Place;
 import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialUpdateRequest;
+import com.brick.demo.social.enums.Delimiter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -83,13 +85,13 @@ public class Social extends BaseEntity {
   private Set<SocialParticipant> participants = new HashSet<>();
 
   public Social(final Account account, final SocialCreateRequest dto) {
-    String address = dto.place().address() + "," + dto.place().detailAddress();
-    String imageUrls = dto.imageUrls() == null ? null : String.join(",", dto.imageUrls());
-    String tags = dto.tags() == null ? null : String.join(",", dto.tags());
+    String imageUrls =
+        dto.imageUrls() == null ? null : String.join(Delimiter.IMAGE_URLS.value(), dto.imageUrls());
+    String tags = dto.tags() == null ? null : String.join(Delimiter.TAGS.value(), dto.tags());
 
     this.name = dto.name();
     this.gatheringDate = dto.gatheringDate();
-    this.address = address;
+    this.address = addressFrom(dto.place());
     this.imageUrls = imageUrls;
     this.tags = tags;
     this.minCount = dto.participantCount().min();
@@ -100,11 +102,15 @@ public class Social extends BaseEntity {
 
   public void update(final SocialUpdateRequest dto) {
     this.name = dto.name();
-    this.address = dto.place().address() + "," + dto.place().detailAddress();
-    this.imageUrls = String.join(",", dto.imageUrls());
+    this.address = addressFrom(dto.place());
+    this.imageUrls = String.join(Delimiter.IMAGE_URLS.value(), dto.imageUrls());
   }
 
   public void cancel() {
     this.canceled = true;
+  }
+
+  private String addressFrom(final Place place) {
+    return place.address() + Delimiter.ADDRESS.value() + place.detailAddress();
   }
 }

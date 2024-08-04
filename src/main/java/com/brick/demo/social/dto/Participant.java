@@ -1,5 +1,7 @@
 package com.brick.demo.social.dto;
 
+import com.brick.demo.auth.entity.Account;
+import com.brick.demo.social.enums.ParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,4 +23,14 @@ public record Participant(
     @Schema(description = "모임 참가자의 한 줄 소개")
     String description
 ) {
+
+    public static Participant from(Account account, ParticipantRole role) {
+        return new Participant(
+            account.getEntityId(),
+            account.getName(),
+            account.getProfileImageUrl(),
+            role.name(),
+            account.getIntroduce()
+        );
+    }
 }

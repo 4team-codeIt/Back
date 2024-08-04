@@ -1,5 +1,6 @@
 package com.brick.demo.social.dto;
 
+import com.brick.demo.social.entity.Social;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotNull;
@@ -17,5 +18,9 @@ public record ParticipantCount(
 
     public ParticipantCount(final Integer min, final Integer max) {
         this(min, max, null);
+    }
+
+    public static ParticipantCount from(final Social social) {
+        return new ParticipantCount(social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
     }
 }

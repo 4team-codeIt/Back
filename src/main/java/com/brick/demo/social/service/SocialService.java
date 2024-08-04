@@ -71,7 +71,7 @@ public class SocialService {
             .findById(id)
             .orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
 
-    return SocialResponse.fromEntity(social);
+    return SocialResponse.from(social);
   }
 
   @Transactional
@@ -127,7 +127,7 @@ public class SocialService {
             .findBySocialId(id)
             .orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
 
-    return SocialDetailResponse.fromEntities(social, detail);
+    return SocialDetailResponse.from(social, detail);
   }
 
   private Page<Social> findAllSocials(

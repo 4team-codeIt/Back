@@ -2,6 +2,7 @@ package com.brick.demo.social.dto;
 
 import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.entity.SocialDetail;
+import com.brick.demo.social.enums.Delimiter;
 import com.brick.demo.social.enums.ParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -47,23 +48,14 @@ public record SocialDetailResponse(
 		@Valid SocialIntroduction introduction
 ) {
 
-	public static SocialDetailResponse fromEntities(final Social social, final SocialDetail detail) {
+	public static SocialDetailResponse from(final Social social, final SocialDetail detail) {
 		ParticipantCount participantCount =
 				new ParticipantCount(
 						social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
 
-		Participant owner = new Participant(
-				social.getOwner().getEntityId(),
-				social.getOwner().getName(),
-				"TODO",
-				ParticipantRole.OWNER.name(),
-				social.getOwner().getIntroduce());
-		List<Participant> participants = makeParticipants(social, owner);
+		Participant owner = Participant.from(social.getOwner(), ParticipantRole.OWNER);
 
-		SocialIntroduction introduction = SocialIntroduction.fromEntities(
-				social.getAddress(),
-				detail
-		);
+		SocialIntroduction introduction = SocialIntroduction.from(social.getAddress(), detail);
 
 		return new SocialDetailResponse(
 				social.getId(),
@@ -71,25 +63,20 @@ public record SocialDetailResponse(
 				detail.getDescription(),
 				social.getGatheringDate(),
 				participantCount,
-				List.of(social.getImageUrls().split(",")),
+				List.of(social.getImageUrls().split(Delimiter.IMAGE_URLS.value())),
 				social.getDues(),
-				List.of(social.getTags().split(",")),
+				List.of(social.getTags().split(Delimiter.TAGS.value())),
 				owner,
-				participants,
-				introduction
+				makeParticipants(social, owner),
+				SocialIntroduction.from(social.getAddress(), detail)
 		);
 	}
 
 	private static List<Participant> makeParticipants(final Social social, final Participant owner) {
 		List<Participant> participants = social.getParticipants().stream()
 				.filter(participant -> !participant.getAccount().getEntityId().equals(social.getOwner().getEntityId()))
-				.map(participant -> new Participant(
-						participant.getAccount().getEntityId(),
-						participant.getAccount().getName(),
-						"TODO",
-						ParticipantRole.PARTICIPANT.name(),
-						participant.getAccount().getIntroduce()
-				)).collect(Collectors.toList());
+				.map(participant -> Participant.from(participant.getAccount(), ParticipantRole.PARTICIPANT))
+				.collect(Collectors.toList());
 		participants.add(owner);
 		return participants;
 	}
