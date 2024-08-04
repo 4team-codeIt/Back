@@ -4,6 +4,7 @@ import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialCreateResponse;
 import com.brick.demo.social.dto.SocialDetailResponse;
 import com.brick.demo.social.dto.SocialResponse;
+import com.brick.demo.social.dto.SocialResponses;
 import com.brick.demo.social.dto.SocialUpdateRequest;
 import com.brick.demo.social.service.SocialService;
 import jakarta.validation.Valid;
@@ -28,24 +29,24 @@ public class SocialController implements SocialControllerDocs {
   private final SocialService socialService;
 
   @GetMapping
-  public ResponseEntity<List<SocialResponse>> getSocials(
+  public ResponseEntity<SocialResponses> getSocials(
       @RequestParam(defaultValue = "0") final int offset,
       @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy,
       @RequestParam(required = false) final List<Long> ids) {
-    List<SocialResponse> response = socialService.getSocials(offset, limit, filterBy, orderBy, ids);
+    SocialResponses response = socialService.getSocials(offset, limit, filterBy, orderBy, ids);
 
     return ResponseEntity.ok(response);
   }
 
   @GetMapping("/me")
-  public ResponseEntity<List<SocialResponse>> getMySocials(
+  public ResponseEntity<SocialResponses> getMySocials(
       @RequestParam(defaultValue = "0") final int offset,
       @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy) {
-    List<SocialResponse> response = socialService.getMySocials(offset, limit, filterBy, orderBy);
+    SocialResponses response = socialService.getMySocials(offset, limit, filterBy, orderBy);
 
     return ResponseEntity.ok(response);
   }

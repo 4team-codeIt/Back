@@ -10,6 +10,7 @@ import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialCreateResponse;
 import com.brick.demo.social.dto.SocialDetailResponse;
 import com.brick.demo.social.dto.SocialResponse;
+import com.brick.demo.social.dto.SocialResponses;
 import com.brick.demo.social.dto.SocialUpdateRequest;
 import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.entity.SocialDetail;
@@ -40,7 +41,7 @@ public class SocialService {
   private final AccountRepository accountRepository;
 
   @Transactional
-  public List<SocialResponse> getSocials(
+  public SocialResponses getSocials(
       final int offset,
       final int limit,
       final String filterBy,
@@ -53,17 +54,21 @@ public class SocialService {
             ? findAllSocials(filterBy, orderBy, pageable)
             : findAllSocialsByIdList(filterBy, orderBy, ids, pageable);
 
-    return socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList());
+    return new SocialResponses(
+        socials.getTotalElements(),
+        socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList()));
   }
 
   @Transactional
-  public List<SocialResponse> getMySocials(
+  public SocialResponses getMySocials(
       final int offset, final int limit, final String filterBy, String orderBy) {
     Pageable pageable = PageRequest.of(offset, limit);
 
-    return findAllMySocials(filterBy, orderBy, pageable).stream()
-        .map(SocialResponse::fromEntity)
-        .collect(Collectors.toList());
+    Page<Social> socials = findAllMySocials(filterBy, orderBy, pageable);
+
+    return new SocialResponses(
+        socials.getTotalElements(),
+        socials.stream().map(SocialResponse::fromEntity).collect(Collectors.toList()));
   }
 
   @Transactional

@@ -4,6 +4,7 @@ import com.brick.demo.social.dto.SocialCreateRequest;
 import com.brick.demo.social.dto.SocialCreateResponse;
 import com.brick.demo.social.dto.SocialDetailResponse;
 import com.brick.demo.social.dto.SocialResponse;
+import com.brick.demo.social.dto.SocialResponses;
 import com.brick.demo.social.dto.SocialUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,7 +30,7 @@ public interface SocialControllerDocs {
   @Operation(summary = "모임 전체 조회", description = "전체 모임을 조회합니다.")
   @ApiResponse(responseCode = "200")
   @GetMapping
-  ResponseEntity<List<SocialResponse>> getSocials(
+  ResponseEntity<SocialResponses> getSocials(
       @Schema(description = "offset", example = "0", requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(defaultValue = "0")
           final int offset,
@@ -63,7 +64,7 @@ public interface SocialControllerDocs {
     @ApiResponse(responseCode = "401", content = @Content(schema = @Schema(hidden = true)))
   })
   @GetMapping("/me")
-  ResponseEntity<List<SocialResponse>> getMySocials(
+  ResponseEntity<SocialResponses> getMySocials(
       @Schema(description = "offset", example = "0", requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(defaultValue = "0")
           final int offset,
