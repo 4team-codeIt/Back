@@ -9,7 +9,7 @@ import com.brick.demo.auth.dto.DuplicateNameResponse;
 import com.brick.demo.auth.dto.SignUpRequest;
 import com.brick.demo.auth.dto.SigninRequest;
 import com.brick.demo.auth.dto.SigninResponse;
-import com.brick.demo.auth.dto.Token;
+import com.brick.demo.auth.jwt.Token;
 import com.brick.demo.auth.dto.UserPatchRequest;
 import com.brick.demo.auth.dto.UserResponse;
 import com.brick.demo.auth.entity.Account;

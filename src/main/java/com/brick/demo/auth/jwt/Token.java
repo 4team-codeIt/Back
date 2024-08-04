@@ -1,4 +1,4 @@
-package com.brick.demo.auth.dto;
+package com.brick.demo.auth.jwt;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

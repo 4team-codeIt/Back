@@ -1,6 +1,5 @@
 package com.brick.demo.auth.jwt;
 
-import com.brick.demo.auth.dto.Token;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
