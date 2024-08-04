@@ -1,6 +1,5 @@
 package com.brick.demo.social.dto;
 
-import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.QnaComment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
@@ -20,7 +19,7 @@ public record QnaCommentPageResponse(
 		Integer currentPage,
 
 		@Schema(description = "Qna 댓글 목록", requiredMode = RequiredMode.REQUIRED)
-		@Valid List<QnaCommentResponseDto> socials
+		@Valid List<QnaCommentResponse> socials
 ) {
 
 	public static QnaCommentPageResponse from(Page<QnaComment> page) {
@@ -28,7 +27,7 @@ public record QnaCommentPageResponse(
 				page.getTotalElements(),
 				page.getTotalPages(),
 				page.getNumber(),
-				page.stream().map(QnaCommentResponseDto::new)
+				page.stream().map(QnaCommentResponse::new)
 						.collect(Collectors.toList()));
 	}
 }

@@ -1,18 +1,16 @@
 package com.brick.demo.social.controller;
 
 import com.brick.demo.social.dto.QnaCommentPageResponse;
-import com.brick.demo.social.dto.QnaCommentPatchDto;
-import com.brick.demo.social.dto.QnaCommentRequestDto;
-import com.brick.demo.social.dto.QnaCommentResponseDto;
+import com.brick.demo.social.dto.QnaCommentPatch;
+import com.brick.demo.social.dto.QnaCommentRequest;
+import com.brick.demo.social.dto.QnaCommentResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +32,8 @@ public interface QnaCommentControllerDocs {
 			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
 	})
 	@PostMapping
-	QnaCommentResponseDto create(@PathVariable Long socialId, @PathVariable Long qnaId,
-			@Valid @RequestBody QnaCommentRequestDto dto);
+	QnaCommentResponse create(@PathVariable Long socialId, @PathVariable Long qnaId,
+			@Valid @RequestBody QnaCommentRequest dto);
 
 	@Operation(summary = "Qna 댓글 목록 조회", description = "특정 Qna의 댓글 목록을 생성일 오름차순으로 페이지네이션하여 조회합니다.")
 	@ApiResponses({
@@ -54,9 +52,9 @@ public interface QnaCommentControllerDocs {
 			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
 	})
 	@PatchMapping("/{commentId}")
-	QnaCommentResponseDto update(@PathVariable Long socialId, @PathVariable Long qnaId,
+	QnaCommentResponse update(@PathVariable Long socialId, @PathVariable Long qnaId,
 			@PathVariable Long commentId,
-			@Valid @RequestBody QnaCommentPatchDto dto);
+			@Valid @RequestBody QnaCommentPatch dto);
 
 	@Operation(summary = "Qna 댓글 삭제", description = "특정 Qna 댓글을 삭제합니다.")
 	@ApiResponses({

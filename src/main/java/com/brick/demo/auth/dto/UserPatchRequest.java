@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import lombok.Getter;
 
 @Getter
-public class UserPatchRequestDto {
+public class UserPatchRequest {
 
 	private LocalDate birthday;
 	private String introduce;

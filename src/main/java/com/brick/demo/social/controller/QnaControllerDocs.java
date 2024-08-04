@@ -1,18 +1,16 @@
 package com.brick.demo.social.controller;
 
 import com.brick.demo.social.dto.QnaPageResponse;
-import com.brick.demo.social.dto.QnaPatchRequestDto;
-import com.brick.demo.social.dto.QnaRequestDto;
-import com.brick.demo.social.dto.QnaResponseDto;
+import com.brick.demo.social.dto.QnaPatchRequest;
+import com.brick.demo.social.dto.QnaRequest;
+import com.brick.demo.social.dto.QnaResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "모임의 Qna", description = "모임 Qna 조회, 수정, 삭제와 관련된 그룹입니다.")
 public interface QnaControllerDocs {
@@ -35,7 +32,7 @@ public interface QnaControllerDocs {
 			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
 	})
 	@PostMapping
-	QnaResponseDto create(@PathVariable Long socialId, @Valid @RequestBody QnaRequestDto dto);
+	QnaResponse create(@PathVariable Long socialId, @Valid @RequestBody QnaRequest dto);
 
 	@Operation(summary = "Qna 목록 조회", description = "특정 social의 Qna 목록을 생성일 내림차순으로 페이지네이션하여 조회합니다.")
 	@ApiResponses({
@@ -54,8 +51,8 @@ public interface QnaControllerDocs {
 			@ApiResponse(responseCode = "400", description = "요청이 유효하지 않습니다", content = @Content(schema = @Schema(hidden = true))),
 	})
 	@PatchMapping("/{qnaId}")
-	QnaResponseDto update(@PathVariable Long socialId, @PathVariable Long qnaId,
-			@Valid @RequestBody QnaPatchRequestDto dto);
+	QnaResponse update(@PathVariable Long socialId, @PathVariable Long qnaId,
+			@Valid @RequestBody QnaPatchRequest dto);
 
 	@Operation(summary = "Qna 삭제", description = "특정 Qna를 삭제합니다.")
 	@ApiResponses({
