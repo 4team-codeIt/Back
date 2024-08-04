@@ -18,7 +18,7 @@ public record SocialResponse(
     @NotEmpty String name,
 
     @Schema(description = "모임 취소 여부", requiredMode = Schema.RequiredMode.REQUIRED)
-    Boolean canceled,
+    @NotNull Boolean canceled,
 
     @Schema(description = "모임 일정", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty LocalDateTime gatheringDate,
@@ -43,7 +43,7 @@ public record SocialResponse(
         return new SocialResponse(
             social.getId(),
             social.getName(),
-            social.getCanceled(),
+            social.getCanceled() == null ? false : social.getCanceled(),
             social.getGatheringDate(),
             social.getAddress().replace(Delimiter.ADDRESS.value(), Delimiter.ADDRESS_REPLACE.value()),
             ParticipantCount.from(social),
