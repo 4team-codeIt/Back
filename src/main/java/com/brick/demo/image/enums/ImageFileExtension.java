@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 public enum ImageFileExtension {
 	JPEG("jpeg"),
 	JPG("jpg"),
-	PNG("png");
+	PNG("png"),
+	WEBP("webp");
 
 	private final String uploadExtension;
 
