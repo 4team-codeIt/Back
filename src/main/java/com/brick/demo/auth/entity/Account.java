@@ -79,8 +79,10 @@ public class Account {
 		this.introduce = introduce;
 		this.profileImageUrl = profileImageUrl;
 	}
-	
+
 	public void softDelete() {
 		this.deletedAt = LocalDateTime.now();
+		this.email = this.email + ".deleted." + this.deletedAt;
+		this.name = this.name + ".deleted." + this.deletedAt;
 	}
 }
