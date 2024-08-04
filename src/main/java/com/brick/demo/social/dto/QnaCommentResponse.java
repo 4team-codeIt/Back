@@ -10,6 +10,7 @@ public class QnaCommentResponse {
 	private Long id;
 	private String content;
 	private String writerName;
+	private String writerProfileImageUrl;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
@@ -17,6 +18,7 @@ public class QnaCommentResponse {
 		this.id = qnaComment.getId();
 		this.content = qnaComment.getContent();
 		this.writerName = qnaComment.getWriter().getName();
+		this.writerProfileImageUrl = qnaComment.getWriter().getProfileImageUrl();
 		this.createdAt = qnaComment.getCreatedAt();
 		this.updatedAt = qnaComment.getUpdatedAt();
 	}
@@ -25,6 +27,7 @@ public class QnaCommentResponse {
 		this.id = qnaComment.getId();
 		this.content = qnaComment.getContent();
 		this.writerName = qnaComment.getWriter().getName();
+		this.writerProfileImageUrl = qnaComment.getWriter().getProfileImageUrl();
 		this.createdAt = qnaComment.getCreatedAt();
 		this.updatedAt = updatedAt;
 	}
