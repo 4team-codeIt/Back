@@ -47,7 +47,7 @@ public class Social extends BaseEntity {
   @Setter
   private String address;
 
-  @Column(name = "image_urls")
+  @Column(name = "image_urls", length = 600)
   @Setter
   private String imageUrls;
 
@@ -99,15 +99,12 @@ public class Social extends BaseEntity {
   }
 
   public void update(final SocialUpdateRequest dto) {
+    this.name = dto.name();
     this.address = dto.place().address() + "," + dto.place().detailAddress();
     this.imageUrls = String.join(",", dto.imageUrls());
   }
 
   public void cancel() {
     this.canceled = true;
-  }
-
-  public void updateDetail(final SocialDetail detail) {
-    this.detail = detail;
   }
 }

@@ -26,23 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocialController implements SocialControllerDocs {
 
   private final SocialService socialService;
-  //
-  //  @GetMapping
-  //  public ResponseEntity<List<SocialResponse>> selectSocials(
-  //      @RequestParam(required = false) final String filterBy,
-  //      @RequestParam(required = false) final String orderBy,
-  //      @RequestParam(required = false) final List<Long> ids) {
-  //    List<SocialResponse> response = socialService.selectSocials(filterBy, orderBy, ids);
-  //
-  //    return ResponseEntity.ok(response);
-  //  }
 
   @GetMapping
   public ResponseEntity<List<SocialResponse>> getSocials(
       @RequestParam(defaultValue = "0") final int offset,
       @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
-
       @RequestParam(required = false) final String orderBy,
       @RequestParam(required = false) final List<Long> ids) {
     List<SocialResponse> response = socialService.getSocials(offset, limit, filterBy, orderBy, ids);
@@ -57,7 +46,6 @@ public class SocialController implements SocialControllerDocs {
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy) {
     List<SocialResponse> response = socialService.getMySocials(offset, limit, filterBy, orderBy);
-
 
     return ResponseEntity.ok(response);
   }
