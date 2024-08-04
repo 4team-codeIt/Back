@@ -1,14 +1,14 @@
 package com.brick.demo.auth.controller;
 
-import com.brick.demo.auth.dto.DuplicateEmailRequestDto;
-import com.brick.demo.auth.dto.DuplicateEmailResponseDto;
-import com.brick.demo.auth.dto.DuplicateNameRequestDto;
-import com.brick.demo.auth.dto.DuplicateNameResponseDto;
-import com.brick.demo.auth.dto.SignUpRequestDto;
-import com.brick.demo.auth.dto.SigninRequestDto;
-import com.brick.demo.auth.dto.SigninResponseDto;
-import com.brick.demo.auth.dto.UserPatchRequestDto;
-import com.brick.demo.auth.dto.UserResponseDto;
+import com.brick.demo.auth.dto.DuplicateEmailRequest;
+import com.brick.demo.auth.dto.DuplicateEmailResponse;
+import com.brick.demo.auth.dto.DuplicateNameRequest;
+import com.brick.demo.auth.dto.DuplicateNameResponse;
+import com.brick.demo.auth.dto.SignUpRequest;
+import com.brick.demo.auth.dto.SigninRequest;
+import com.brick.demo.auth.dto.SigninResponse;
+import com.brick.demo.auth.dto.UserPatchRequest;
+import com.brick.demo.auth.dto.UserResponse;
 import com.brick.demo.auth.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,10 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,12 +44,12 @@ public class AuthController implements AuthControllerDocs {
 	}
 
 	@GetMapping(value = "/users")
-	public Optional<UserResponseDto> accountDetails() {
+	public Optional<UserResponse> accountDetails() {
 		return authService.getAccountDetail();
 	}
 
 	@PatchMapping(value = "/users")
-	public UserResponseDto updateAccount(@RequestBody UserPatchRequestDto dto) {
+	public UserResponse updateAccount(@RequestBody UserPatchRequest dto) {
 		return authService.updateAccount(dto);
 	}
 
@@ -64,13 +62,13 @@ public class AuthController implements AuthControllerDocs {
 
 	@PostMapping("/signup")
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createAccount(@Valid @RequestBody SignUpRequestDto dto) {
+	public void createAccount(@Valid @RequestBody SignUpRequest dto) {
 		authService.createAccount(dto);
 	}
 
 	@PostMapping("/signin")
-	public SigninResponseDto createAuthenticationToken(
-			@RequestBody SigninRequestDto dto) {
+	public SigninResponse createAuthenticationToken(
+			@RequestBody SigninRequest dto) {
 		return authService.signin(dto);
 	}
 
@@ -86,15 +84,15 @@ public class AuthController implements AuthControllerDocs {
 //  }
 
 	@PostMapping("/users/duplicate-email")
-	public DuplicateEmailResponseDto duplicateEmail(
-			@RequestBody DuplicateEmailRequestDto dto) {
+	public DuplicateEmailResponse duplicateEmail(
+			@RequestBody DuplicateEmailRequest dto) {
 		return authService.isDuplicatedEmail(dto);
 	}
 
 
 	@PostMapping("/users/duplicate-name")
-	public DuplicateNameResponseDto duplicateName(
-			@RequestBody DuplicateNameRequestDto dto) {
+	public DuplicateNameResponse duplicateName(
+			@RequestBody DuplicateNameRequest dto) {
 		return authService.isDuplicatedName(dto);
 	}
 }

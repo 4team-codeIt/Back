@@ -9,6 +9,7 @@ import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.image.enums.ImageFileExtension;
 import com.brick.demo.image.dto.PresignedUrlResponse;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +44,11 @@ public class ImageService {
 		return PresignedUrlResponse.of(url.toString(), fileName, baseUrl);
 	}
 
-	public PresignedUrlResponse createSocialImagePresignedUrl(Long socialId,
-			ImageFileExtension fileExtension) {
+	public PresignedUrlResponse createSocialImagePresignedUrl(ImageFileExtension fileExtension) {
 //		fileExtension.validate();
 		String fixedFileExtension = fileExtension.getUploadExtension();
-		String fileName = getFileNameInFolder(socialsFolder + socialId + "/", fixedFileExtension);
+		LocalDate nowDate = LocalDate.now();
+		String fileName = getFileNameInFolder(socialsFolder + nowDate + "/", fixedFileExtension);
 		URL url = amazonS3.generatePresignedUrl(
 				getGeneratePresignedUrlRequest(bucket, fileName, fixedFileExtension));
 		return PresignedUrlResponse.of(url.toString(), fileName, baseUrl);

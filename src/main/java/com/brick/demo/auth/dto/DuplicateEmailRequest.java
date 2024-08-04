@@ -6,14 +6,14 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 
 @Getter
-public class DuplicateEmailRequestDto {
+public class DuplicateEmailRequest {
 
-  @Email
-  @NotEmpty
-  private final String email;
+	@Email
+	@NotEmpty
+	private final String email;
 
-  @JsonCreator
-  public DuplicateEmailRequestDto(String email) {
-    this.email = email;
-  }
+	@JsonCreator
+	public DuplicateEmailRequest(String email) {
+		this.email = email;
+	}
 }

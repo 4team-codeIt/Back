@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class QnaCommentRequestDto {
+public class QnaCommentRequest {
 
 	@NotEmpty(message = "내용은 빈 문자열일 수 없습니다")
 	@Size(max = 600, message = "내용은 600자를 넘을 수 없습니다")

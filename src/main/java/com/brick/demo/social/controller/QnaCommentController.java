@@ -1,12 +1,11 @@
 package com.brick.demo.social.controller;
 
-import com.brick.demo.common.dto.PaginationIdResponse;
-import com.brick.demo.social.dto.QnaCommentPatchDto;
-import com.brick.demo.social.dto.QnaCommentRequestDto;
-import com.brick.demo.social.dto.QnaCommentResponseDto;
+import com.brick.demo.social.dto.QnaCommentPageResponse;
+import com.brick.demo.social.dto.QnaCommentPatch;
+import com.brick.demo.social.dto.QnaCommentRequest;
+import com.brick.demo.social.dto.QnaCommentResponse;
 import com.brick.demo.social.service.QnaCommentService;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,22 +39,22 @@ public class QnaCommentController implements QnaCommentControllerDocs {
 //	}
 
 	@GetMapping // 오프셋 기반 페이지네이션
-	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(@PathVariable Long socialId,
+	public QnaCommentPageResponse getCommentsByQnaId(@PathVariable Long socialId,
 			@PathVariable Long qnaId, @ParameterObject Pageable pageable) {
 		return qnaCommentService.getCommentsByQnaId(socialId, qnaId, pageable);
 	}
 
 	@PostMapping
-	public QnaCommentResponseDto create(@PathVariable Long socialId, @PathVariable Long qnaId,
-			@Valid @RequestBody QnaCommentRequestDto dto) {
+	public QnaCommentResponse create(@PathVariable Long socialId, @PathVariable Long qnaId,
+			@Valid @RequestBody QnaCommentRequest dto) {
 		return qnaCommentService.create(qnaId, dto);
 	}
 
 	@PatchMapping("/{commentId}")
-	public QnaCommentResponseDto update(@PathVariable Long socialId, @PathVariable Long qnaId,
+	public QnaCommentResponse update(@PathVariable Long socialId, @PathVariable Long qnaId,
 			@PathVariable Long commentId,
 			@Valid @RequestBody
-			QnaCommentPatchDto dto) {
+			QnaCommentPatch dto) {
 		return qnaCommentService.update(commentId, dto);
 	}
 

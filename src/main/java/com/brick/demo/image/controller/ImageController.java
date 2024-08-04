@@ -24,9 +24,9 @@ public class ImageController {
 		return imageService.createUserProfileImagePresignedUrl(imageFileExtension);
 	}
 
-	@GetMapping("/socials/{id}/images")
-	public PresignedUrlResponse createSocilaImagePresignedUrl(@PathVariable final Long id,
+	@GetMapping("/socials/images")
+	public PresignedUrlResponse createSocilaImagePresignedUrl(
 			@RequestParam ImageFileExtension imageFileExtension) {
-		return imageService.createSocialImagePresignedUrl(id, imageFileExtension);
+		return imageService.createSocialImagePresignedUrl(imageFileExtension);
 	}
 }

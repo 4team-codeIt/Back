@@ -1,18 +1,17 @@
 package com.brick.demo.auth.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 
 @Getter
-public class DuplicateNameRequestDto {
+public class DuplicateNameResponse {
 
 	@NotEmpty
-	private final String name;
+	private final Boolean duplicateName;
 
 	@JsonCreator
-	public DuplicateNameRequestDto(String name) {
-		this.name = name;
+	public DuplicateNameResponse(Boolean duplicateName) {
+		this.duplicateName = duplicateName;
 	}
 }

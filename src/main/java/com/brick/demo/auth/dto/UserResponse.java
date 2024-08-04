@@ -1,15 +1,11 @@
 package com.brick.demo.auth.dto;
 
 import com.brick.demo.auth.entity.Account;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import java.time.LocalDate;
-import java.util.Date;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class UserResponseDto {
+public class UserResponse {
 
 	private final String email;
 	private final String name;
@@ -17,7 +13,7 @@ public class UserResponseDto {
 	private final String introduce;
 	private final String profileImageUrl;
 
-	public UserResponseDto(Account account) {
+	public UserResponse(Account account) {
 		this.email = account.getEmail();
 		this.name = account.getName();
 		this.birthday = account.getBirthday();

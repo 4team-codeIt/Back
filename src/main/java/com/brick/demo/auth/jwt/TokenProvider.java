@@ -1,6 +1,5 @@
 package com.brick.demo.auth.jwt;
 
-import com.brick.demo.auth.dto.TokenDto;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
@@ -37,7 +36,7 @@ public class TokenProvider {
 		this.key = Keys.hmacShaKeyFor(keyBytes);
 	}
 
-	public TokenDto generateToken(Authentication authentication) {
+	public Token generateToken(Authentication authentication) {
 		long now = (new Date()).getTime();
 		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
@@ -54,7 +53,7 @@ public class TokenProvider {
 				.signWith(key, SignatureAlgorithm.HS256)
 				.compact();
 
-		return TokenDto.builder()
+		return Token.builder()
 				.grantType(BEARER_TYPE)
 				.accessToken(accessToken)
 				.accessTokenExpiresIn(accessTokenExpiresIn.getTime())

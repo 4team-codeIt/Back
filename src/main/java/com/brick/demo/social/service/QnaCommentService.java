@@ -5,28 +5,21 @@ import static com.brick.demo.security.SecurityUtil.getCurrentAccount;
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
-import com.brick.demo.common.dto.PaginationIdResponse;
-import com.brick.demo.social.dto.QnaCommentPatchDto;
-import com.brick.demo.social.dto.QnaCommentRequestDto;
-import com.brick.demo.social.dto.QnaCommentResponseDto;
-import com.brick.demo.social.dto.QnaResponseDto;
+import com.brick.demo.social.dto.QnaCommentPageResponse;
+import com.brick.demo.social.dto.QnaCommentPatch;
+import com.brick.demo.social.dto.QnaCommentRequest;
+import com.brick.demo.social.dto.QnaCommentResponse;
 import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.QnaComment;
 import com.brick.demo.social.repository.QnaCommentRepository;
 import com.brick.demo.social.repository.QnaRepository;
 import com.brick.demo.social.repository.SocialRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -55,7 +48,7 @@ public class QnaCommentService {
 //		return new PaginationIdResponse(nextCursor, commentResponseDtos);
 //	}
 
-	public ResponseEntity<List<QnaCommentResponseDto>> getCommentsByQnaId(Long socialId, Long qnaId,
+	public QnaCommentPageResponse getCommentsByQnaId(Long socialId, Long qnaId,
 			Pageable pageable) {
 		socialRepository.findById(socialId).orElseThrow(
 				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
@@ -66,15 +59,11 @@ public class QnaCommentService {
 		Page<QnaComment> qnaCommentPage = qnaCommentRepository.findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(
 				qnaId,
 				pageable);
-
-		List<QnaCommentResponseDto> qnaCommentResponseDtos = qnaCommentPage.getContent().stream()
-				.map(QnaCommentResponseDto::new)
-				.collect(Collectors.toList());
-		return new ResponseEntity<>(qnaCommentResponseDtos, HttpStatus.OK);
+		return QnaCommentPageResponse.from(qnaCommentPage);
 	}
 
 	@Transactional
-	public QnaCommentResponseDto create(Long qnaId, QnaCommentRequestDto dto) {
+	public QnaCommentResponse create(Long qnaId, QnaCommentRequest dto) {
 		Account account = getCurrentAccount(accountRepository);
 		Qna qna = qnaRepository.findById(qnaId)
 				.orElseThrow(
@@ -82,11 +71,11 @@ public class QnaCommentService {
 		QnaComment qnaComment = dto.toEntity(qna, account);
 		qnaComment = qnaCommentRepository.save(qnaComment);
 
-		return new QnaCommentResponseDto(qnaComment);
+		return new QnaCommentResponse(qnaComment);
 	}
 
 	@Transactional
-	public QnaCommentResponseDto update(Long commentId, QnaCommentPatchDto dto) {
+	public QnaCommentResponse update(Long commentId, QnaCommentPatch dto) {
 		QnaComment qnaComment = qnaCommentRepository.findById(commentId)
 				.orElseThrow(
 						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna 댓글 ID의 댓글을 찾을 수 없습니다"));
@@ -96,7 +85,7 @@ public class QnaCommentService {
 		qnaCommentRepository.save(qnaComment);
 		qnaCommentRepository.flush(); //영속성 컨텍스트의 변경사항을 DB에 바로 반영
 		LocalDateTime updatedAt = qnaCommentRepository.findById(commentId).get().getUpdatedAt();
-		return new QnaCommentResponseDto(qnaComment, updatedAt);
+		return new QnaCommentResponse(qnaComment, updatedAt);
 	}
 
 	@Transactional

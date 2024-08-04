@@ -6,10 +6,10 @@ import com.brick.demo.auth.entity.Account;
 import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
-import com.brick.demo.common.dto.PaginationDateResponse;
-import com.brick.demo.social.dto.QnaPatchRequestDto;
-import com.brick.demo.social.dto.QnaRequestDto;
-import com.brick.demo.social.dto.QnaResponseDto;
+import com.brick.demo.social.dto.QnaPageResponse;
+import com.brick.demo.social.dto.QnaPatchRequest;
+import com.brick.demo.social.dto.QnaRequest;
+import com.brick.demo.social.dto.QnaResponse;
 import com.brick.demo.social.entity.Qna;
 import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.repository.QnaCommentRepository;
@@ -18,17 +18,13 @@ import com.brick.demo.social.repository.SocialRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,30 +54,25 @@ public class QnaService {
 //		return new PaginationDateResponse(nextCursor, qnaResponseDtos);
 //	}
 
-	public ResponseEntity<List<QnaResponseDto>> getQnasBySocialIdByCreatedAt(Long socialId,
+	public QnaPageResponse getQnasBySocialIdByCreatedAt(Long socialId,
 			Pageable pageable) {
 		socialRepository.findById(socialId).orElseThrow(
 				() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Social ID의 Social를 찾을 수 없습니다"));
 
 		Page<Qna> qnaPage = qnaRepository.findBySocialIdAndDeletedAtIsNull(socialId, pageable);
-
-		List<QnaResponseDto> qnaResponseDtos = qnaPage.getContent().stream()
-				.map(qna -> new QnaResponseDto(qna, qna.getCommentCount()))
-				.collect(Collectors.toList());
-
-		return new ResponseEntity<>(qnaResponseDtos, HttpStatus.OK);
+		return QnaPageResponse.from(qnaPage);
 	}
 
 
 	@Transactional
-	public QnaResponseDto create(Long socialId, @Valid QnaRequestDto dto) {
+	public QnaResponse create(Long socialId, @Valid QnaRequest dto) {
 		final Account account = getCurrentAccount(accountRepository);
 		final Social social = socialRepository.findById(socialId)
 				.orElseThrow(() -> new CustomException(ErrorDetails.SOCIAL_NOT_FOUND));
 		Qna qna = dto.toEntity(account, social);
 		qna = qnaRepository.save(qna);
 
-		return QnaResponseDto.builder().id(String.valueOf(qna.getId())).title(qna.getTitle())
+		return QnaResponse.builder().id(String.valueOf(qna.getId())).title(qna.getTitle())
 				.content(qna.getContent()).writerName(account.getName()).commentCount(0)
 				.createdAt(qna.getCreatedAt())
 				.updatedAt(qna.getUpdatedAt())
@@ -89,7 +80,7 @@ public class QnaService {
 	}
 
 	@Transactional
-	public QnaResponseDto update(Long qnaId, QnaPatchRequestDto dto) {
+	public QnaResponse update(Long qnaId, QnaPatchRequest dto) {
 		Qna qna = qnaRepository.findById(qnaId)
 				.orElseThrow(
 						() -> new CustomException(HttpStatus.NOT_FOUND, "해당하는 Qna ID의 Qna를 찾을 수 없습니다"));
@@ -100,7 +91,7 @@ public class QnaService {
 		qnaRepository.save(qna);
 		qnaRepository.flush(); //영속성 컨텍스트의 변경사항을 DB에 바로 반영
 		LocalDateTime updatedAt = qnaRepository.findById(qnaId).get().getUpdatedAt();
-		return new QnaResponseDto(qna, updatedAt, List.of());
+		return new QnaResponse(qna, updatedAt, List.of());
 	}
 
 	public void delete(Long qnaId) {
