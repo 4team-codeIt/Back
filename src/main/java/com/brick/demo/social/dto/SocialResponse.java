@@ -1,6 +1,7 @@
 package com.brick.demo.social.dto;
 
 import com.brick.demo.social.entity.Social;
+import com.brick.demo.social.enums.Delimiter;
 import com.brick.demo.social.enums.ParticipantRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -15,6 +16,9 @@ public record SocialResponse(
 
     @Schema(description = "모임 이름", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty String name,
+
+    @Schema(description = "모임 취소 여부", requiredMode = Schema.RequiredMode.REQUIRED)
+    Boolean canceled,
 
     @Schema(description = "모임 일정", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty LocalDateTime gatheringDate,
@@ -35,29 +39,21 @@ public record SocialResponse(
     @Valid Participant owner
 ) {
 
-    public static SocialResponse fromEntity(Social social) {
-        ParticipantCount participantCount =
-            new ParticipantCount(
-                social.getMinCount(), social.getMaxCount(), social.getParticipants().size());
-
-        String thumbnail = social.getImageUrls().split(",")[0];
-
-        Participant owner = new Participant(
-            social.getOwner().getEntityId(),
-            social.getOwner().getName(),
-            "TODO 프로필 URL",
-            ParticipantRole.OWNER.name(),
-            social.getOwner().getIntroduce());
-
+    public static SocialResponse from(Social social) {
         return new SocialResponse(
             social.getId(),
             social.getName(),
+            social.getCanceled(),
             social.getGatheringDate(),
-            social.getAddress().replace(",", " "),
-            participantCount,
-            thumbnail,
-            List.of(social.getTags().split(",")),
-            owner
+            social.getAddress().replace(Delimiter.ADDRESS.value(), Delimiter.ADDRESS_REPLACE.value()),
+            ParticipantCount.from(social),
+            thumbnailFrom(social.getImageUrls()),
+            List.of(social.getTags().split(Delimiter.TAGS.value())),
+            Participant.from(social.getOwner(), ParticipantRole.OWNER)
         );
+    }
+
+    private static String thumbnailFrom(final String imageUrls) {
+        return imageUrls.split(Delimiter.IMAGE_URLS.value())[0];
     }
 }
