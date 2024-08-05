@@ -17,12 +17,6 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
   Page<Social> findAllByNameContainingIgnoreCaseOrderByCreatedAtDesc(
       final String name, final Pageable pageable);
 
-  Page<Social> findAllByNameContainingIgnoreCaseAndGatheringDateBeforeOrderByCreatedAtDesc(
-      final String name, final LocalDateTime date, final Pageable pageable);
-
-  Page<Social> findAllByNameContainingIgnoreCaseAndGatheringDateAfterOrderByCreatedAtDesc(
-      final String name, final LocalDateTime date, final Pageable pageable);
-
   Page<Social> findAllByCanceledTrueOrderByCreatedAtDesc(final Pageable pageable);
 
   @Query(
@@ -30,17 +24,25 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
   Page<Social> findAllByNameContainingIgnoreCaseOrderByPopularityDesc(
       @Param("name") final String name, final Pageable pageable);
 
-  default Page<Social> findAllInProgress(
-      final String name, final LocalDateTime date, final Pageable pageable) {
-    return findAllByNameContainingIgnoreCaseAndGatheringDateBeforeOrderByCreatedAtDesc(
-        name, date, pageable);
-  }
+  @Query(
+      "SELECT s FROM Social s "
+          + "WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%')) "
+          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount "
+          + "ORDER BY s.createdAt DESC")
+  Page<Social> findAllInProgress(
+      @Param("name") final String name,
+      @Param("date") final LocalDateTime date,
+      final Pageable pageable);
 
-  default Page<Social> findAllCompleted(
-      final String name, final LocalDateTime date, final Pageable pageable) {
-    return findAllByNameContainingIgnoreCaseAndGatheringDateAfterOrderByCreatedAtDesc(
-        name, date, pageable);
-  }
+  @Query(
+      "SELECT s FROM Social s "
+          + "WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%')) "
+          + "AND (s.gatheringDate <= :date OR SIZE(s.participants) >= s.maxCount) "
+          + "ORDER BY s.createdAt DESC")
+  Page<Social> findAllCompleted(
+      @Param("name") final String name,
+      @Param("date") final LocalDateTime date,
+      final Pageable pageable);
 
   default Page<Social> findAllCanceled(final Pageable pageable) {
     return findAllByCanceledTrueOrderByCreatedAtDesc(pageable);
@@ -58,24 +60,26 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
 
   Page<Social> findAllByIdInOrderByCreatedAtDesc(final List<Long> ids, final Pageable pageable);
 
-  Page<Social> findAllByIdInAndGatheringDateBeforeOrderByCreatedAtDesc(
-      final List<Long> ids, final LocalDateTime date, final Pageable pageable);
-
-  Page<Social> findAllByIdInAndGatheringDateAfterOrderByCreatedAtDesc(
-      final List<Long> ids, final LocalDateTime date, final Pageable pageable);
-
   @Query("SELECT s FROM Social s WHERE s.id IN :ids ORDER BY SIZE(s.participants) DESC")
   Page<Social> findAllByIdInOrderByPopularityDesc(final List<Long> ids, final Pageable pageable);
 
-  default Page<Social> findPartInProgress(
-      final List<Long> ids, final LocalDateTime date, final Pageable pageable) {
-    return findAllByIdInAndGatheringDateAfterOrderByCreatedAtDesc(ids, date, pageable);
-  }
+  @Query(
+      "SELECT s FROM Social s "
+          + "WHERE s.id IN :ids "
+          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount "
+          + "ORDER BY s.createdAt DESC")
+  Page<Social> findPartInProgress(
+      @Param("ids") final List<Long> ids,
+      @Param("date") final LocalDateTime date,
+      final Pageable pageable);
 
-  default Page<Social> findPartCompleted(
-      final List<Long> ids, final LocalDateTime date, final Pageable pageable) {
-    return findAllByIdInAndGatheringDateBeforeOrderByCreatedAtDesc(ids, date, pageable);
-  }
+  @Query(
+      "SELECT s FROM Social s "
+          + "WHERE s.id IN :ids "
+          + "AND (s.gatheringDate <= :date OR SIZE(s.participants) >= s.maxCount) "
+          + "ORDER BY s.createdAt DESC")
+  Page<Social> findPartCompleted(
+      final List<Long> ids, final LocalDateTime date, final Pageable pageable);
 
   default Page<Social> findPartOrderByPopularity(final List<Long> ids, final Pageable pageable) {
     return findAllByIdInOrderByPopularityDesc(ids, pageable);
