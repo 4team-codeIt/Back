@@ -7,6 +7,7 @@ import com.brick.demo.auth.repository.AccountRepository;
 import com.brick.demo.common.CustomException;
 import com.brick.demo.common.ErrorDetails;
 import com.brick.demo.social.dto.request.SocialCreateRequest;
+import com.brick.demo.social.dto.request.SocialQuery;
 import com.brick.demo.social.dto.request.SocialUpdateRequest;
 import com.brick.demo.social.dto.response.SocialCreateResponse;
 import com.brick.demo.social.dto.response.SocialDetailResponse;
@@ -40,28 +41,29 @@ public class SocialService {
   private final AccountRepository accountRepository;
 
   @Transactional
-  public SocialResponses getSocials(
-      final int offset,
-      final int limit,
-      final String filterBy,
-      final String orderBy,
-      final List<Long> ids) {
-    Pageable pageable = PageRequest.of(offset, limit);
+  public SocialResponses getSocials(final SocialQuery query) {
+    Pageable pageable = PageRequest.of(query.offset(), query.limit());
 
     Page<Social> pages =
-        ids == null
-            ? findAllSocials(filterBy, orderBy, pageable)
-            : findAllSocialsByIdList(filterBy, orderBy, ids, pageable);
+        query.ids() == null
+            ? findAllSocials(
+                query.filterBy(), query.orderBy(), query.name(), query.tags(), pageable)
+            : findAllSocialsByIdList(
+                query.filterBy(),
+                query.orderBy(),
+                query.name(),
+                query.tags(),
+                query.ids(),
+                pageable);
 
     return SocialResponses.from(pages);
   }
 
   @Transactional
-  public SocialResponses getMySocials(
-      final int offset, final int limit, final String filterBy, String orderBy) {
-    Pageable pageable = PageRequest.of(offset, limit);
+  public SocialResponses getMySocials(final SocialQuery query) {
+    Pageable pageable = PageRequest.of(query.offset(), query.limit());
 
-    return SocialResponses.from(findAllMySocials(filterBy, orderBy, pageable));
+    return SocialResponses.from(findAllMySocials(query.filterBy(), query.orderBy(), pageable));
   }
 
   @Transactional
@@ -131,44 +133,53 @@ public class SocialService {
   }
 
   private Page<Social> findAllSocials(
-      final String filterBy, final String orderBy, Pageable pageable) {
+      final String filterBy,
+      final String orderBy,
+      final String name,
+      final List<String> tags,
+      Pageable pageable) {
     LocalDateTime now = LocalDateTime.now();
     String filter = (filterBy == null) ? "" : filterBy;
     String order = (orderBy == null) ? "" : orderBy;
+    String nameKeyword = parseKeyword(name);
 
     switch (filter) {
       case "open":
-        return socialRepository.findAllByGatheringDateAfterOrderByCreatedAtDesc(now, pageable);
+        return socialRepository.findAllInProgress(nameKeyword, now, pageable);
       case "close":
-        return socialRepository.findAllByGatheringDateBeforeOrderByCreatedAtDesc(now, pageable);
+        return socialRepository.findAllCompleted(nameKeyword, now, pageable);
       case "cancel":
-        return socialRepository.findAllByCanceledTrueOrderByCreatedAtDesc(pageable);
+        return socialRepository.findAllCanceled(pageable);
       default:
         if (order.equals("popularity")) {
-          return socialRepository.findAllByOrderByPopularityDesc(pageable);
+          return socialRepository.findAllOrderByPopularity(nameKeyword, pageable);
         }
-        return socialRepository.findAllByOrderByCreatedAtDesc(pageable);
+        return socialRepository.findAllDefault(nameKeyword, pageable);
     }
   }
 
   private Page<Social> findAllSocialsByIdList(
-      final String filterBy, final String orderBy, final List<Long> ids, Pageable pageable) {
+      final String filterBy,
+      final String orderBy,
+      final String name,
+      final List<String> tags,
+      final List<Long> ids,
+      Pageable pageable) {
     LocalDateTime now = LocalDateTime.now();
     String filter = (filterBy == null) ? "" : filterBy;
     String order = (orderBy == null) ? "" : orderBy;
+    String nameKeyword = parseKeyword(name);
 
     switch (filter) {
       case "open":
-        return socialRepository.findAllByIdInAndGatheringDateAfterOrderByCreatedAtDesc(
-            ids, now, pageable);
+        return socialRepository.findPartInProgress(ids, now, pageable);
       case "close":
-        return socialRepository.findAllByIdInAndGatheringDateBeforeOrderByCreatedAtDesc(
-            ids, now, pageable);
+        return socialRepository.findPartCompleted(ids, now, pageable);
       default:
         if (order.equals("popularity")) {
-          return socialRepository.findAllByIdInOrderByPopularityDesc(ids, pageable);
+          return socialRepository.findPartOrderByPopularity(ids, pageable);
         }
-        return socialRepository.findAllByIdInOrderByCreatedAtDesc(ids, pageable);
+        return socialRepository.findPartDefault(ids, pageable);
     }
   }
 
@@ -183,17 +194,18 @@ public class SocialService {
 
     switch (filter) {
       case "open":
-        return socialRepository.findAllByOwnerEntityIdAndGatheringDateAfterOrderByCreatedAtDesc(
-            ownerEntityId, now, pageable);
+        return socialRepository.findMineInProgress(ownerEntityId, now, pageable);
       case "close":
-        return socialRepository.findAllByOwnerEntityIdAndGatheringDateBeforeOrderByCreatedAtDesc(
-            ownerEntityId, now, pageable);
+        return socialRepository.findMineCompleted(ownerEntityId, now, pageable);
       default:
         if (order.equals("popularity")) {
-          return socialRepository.findAllByOwnerEntityIdOrderByPopularityDesc(
-              ownerEntityId, pageable);
+          return socialRepository.findMineOrderByPopularity(ownerEntityId, pageable);
         }
-        return socialRepository.findAllByOwnerEntityIdOrderByCreatedAtDesc(ownerEntityId, pageable);
+        return socialRepository.findMineDefault(ownerEntityId, pageable);
     }
+  }
+
+  private String parseKeyword(final String keyword) {
+    return (keyword == null || keyword.isEmpty()) ? "" : keyword;
   }
 }

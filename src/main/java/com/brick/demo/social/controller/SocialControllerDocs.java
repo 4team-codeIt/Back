@@ -51,6 +51,12 @@ public interface SocialControllerDocs {
               requiredMode = RequiredMode.NOT_REQUIRED)
           @RequestParam(required = false)
           final String orderBy,
+      @Schema(description = "모임 이름 검색 키워드", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(required = false)
+          final String name,
+      @Schema(description = "모임 태그 검색 키워드", requiredMode = RequiredMode.NOT_REQUIRED)
+          @RequestParam(required = false)
+          final List<String> tags,
       @Schema(
               description = "찜한 모임 아이디 목록",
               example = "1,2,3",

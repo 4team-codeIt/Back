@@ -1,6 +1,7 @@
 package com.brick.demo.social.controller;
 
 import com.brick.demo.social.dto.request.SocialCreateRequest;
+import com.brick.demo.social.dto.request.SocialQuery;
 import com.brick.demo.social.dto.request.SocialUpdateRequest;
 import com.brick.demo.social.dto.response.SocialCreateResponse;
 import com.brick.demo.social.dto.response.SocialDetailResponse;
@@ -34,8 +35,12 @@ public class SocialController implements SocialControllerDocs {
       @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy,
+      @RequestParam(required = false) final String name,
+      @RequestParam(required = false) final List<String> tags,
       @RequestParam(required = false) final List<Long> ids) {
-    SocialResponses response = socialService.getSocials(offset, limit, filterBy, orderBy, ids);
+    SocialResponses response =
+        socialService.getSocials(
+            new SocialQuery(offset, limit, filterBy, orderBy, name, tags, ids));
 
     return ResponseEntity.ok(response);
   }
@@ -46,7 +51,8 @@ public class SocialController implements SocialControllerDocs {
       @RequestParam(defaultValue = "30") final int limit,
       @RequestParam(required = false) final String filterBy,
       @RequestParam(required = false) final String orderBy) {
-    SocialResponses response = socialService.getMySocials(offset, limit, filterBy, orderBy);
+    SocialResponses response =
+        socialService.getMySocials(SocialQuery.forMe(offset, limit, filterBy, orderBy));
 
     return ResponseEntity.ok(response);
   }
