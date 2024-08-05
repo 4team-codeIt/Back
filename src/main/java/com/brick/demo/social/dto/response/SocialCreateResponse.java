@@ -1,4 +1,4 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.social.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;

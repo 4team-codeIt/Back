@@ -1,5 +1,7 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.social.dto.request;
 
+import com.brick.demo.social.dto.common.ParticipantCount;
+import com.brick.demo.social.dto.common.Place;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.Valid;

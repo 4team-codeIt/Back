@@ -1,5 +1,7 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.social.dto.response;
 
+import com.brick.demo.social.dto.common.Participant;
+import com.brick.demo.social.dto.common.ParticipantCount;
 import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.enums.Delimiter;
 import com.brick.demo.social.enums.ParticipantRole;

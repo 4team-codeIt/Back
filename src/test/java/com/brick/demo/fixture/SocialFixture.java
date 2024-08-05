@@ -1,8 +1,8 @@
 package com.brick.demo.fixture;
 
-import com.brick.demo.social.dto.ParticipantCount;
-import com.brick.demo.social.dto.Place;
-import com.brick.demo.social.dto.SocialCreateRequest;
+import com.brick.demo.social.dto.common.ParticipantCount;
+import com.brick.demo.social.dto.common.Place;
+import com.brick.demo.social.dto.request.SocialCreateRequest;
 import java.time.LocalDateTime;
 
 public class SocialFixture {

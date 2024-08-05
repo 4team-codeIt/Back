@@ -2,9 +2,9 @@ package com.brick.demo.social.entity;
 
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.common.entity.BaseEntity;
-import com.brick.demo.social.dto.Place;
-import com.brick.demo.social.dto.SocialCreateRequest;
-import com.brick.demo.social.dto.SocialUpdateRequest;
+import com.brick.demo.social.dto.common.Place;
+import com.brick.demo.social.dto.request.SocialCreateRequest;
+import com.brick.demo.social.dto.request.SocialUpdateRequest;
 import com.brick.demo.social.enums.Delimiter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

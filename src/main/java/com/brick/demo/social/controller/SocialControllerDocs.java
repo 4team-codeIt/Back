@@ -1,11 +1,11 @@
 package com.brick.demo.social.controller;
 
-import com.brick.demo.social.dto.SocialCreateRequest;
-import com.brick.demo.social.dto.SocialCreateResponse;
-import com.brick.demo.social.dto.SocialDetailResponse;
-import com.brick.demo.social.dto.SocialResponse;
-import com.brick.demo.social.dto.SocialResponses;
-import com.brick.demo.social.dto.SocialUpdateRequest;
+import com.brick.demo.social.dto.request.SocialCreateRequest;
+import com.brick.demo.social.dto.request.SocialUpdateRequest;
+import com.brick.demo.social.dto.response.SocialCreateResponse;
+import com.brick.demo.social.dto.response.SocialDetailResponse;
+import com.brick.demo.social.dto.response.SocialResponse;
+import com.brick.demo.social.dto.response.SocialResponses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

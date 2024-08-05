@@ -1,4 +1,4 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.social.dto.common;
 
 import com.brick.demo.auth.entity.Account;
 import com.brick.demo.social.enums.ParticipantRole;
