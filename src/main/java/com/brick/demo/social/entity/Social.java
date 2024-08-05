@@ -49,7 +49,7 @@ public class Social extends BaseEntity {
   @Setter
   private String address;
 
-  @Column(name = "image_urls", length = 600)
+  @Column(name = "image_urls", length = 700)
   @Setter
   private String imageUrls;
 
