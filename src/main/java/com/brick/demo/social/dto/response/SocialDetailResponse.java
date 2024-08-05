@@ -1,5 +1,8 @@
-package com.brick.demo.social.dto;
+package com.brick.demo.social.dto.response;
 
+import com.brick.demo.social.dto.common.Participant;
+import com.brick.demo.social.dto.common.ParticipantCount;
+import com.brick.demo.social.dto.common.SocialIntroduction;
 import com.brick.demo.social.entity.Social;
 import com.brick.demo.social.entity.SocialDetail;
 import com.brick.demo.social.enums.Delimiter;
@@ -19,6 +22,9 @@ public record SocialDetailResponse(
 
 		@Schema(description = "모임 이름", requiredMode = Schema.RequiredMode.REQUIRED)
 		@NotEmpty String name,
+
+		@Schema(description = "모임 취소 여부", requiredMode = Schema.RequiredMode.REQUIRED)
+		@NotNull Boolean canceled,
 
 		@Schema(description = "모임 소개", requiredMode = Schema.RequiredMode.REQUIRED)
 		@NotEmpty String description,
@@ -55,11 +61,10 @@ public record SocialDetailResponse(
 
 		Participant owner = Participant.from(social.getOwner(), ParticipantRole.OWNER);
 
-		SocialIntroduction introduction = SocialIntroduction.from(social.getAddress(), detail);
-
 		return new SocialDetailResponse(
 				social.getId(),
 				social.getName(),
+				social.getCanceled() == null ? false : social.getCanceled(),
 				detail.getDescription(),
 				social.getGatheringDate(),
 				participantCount,
