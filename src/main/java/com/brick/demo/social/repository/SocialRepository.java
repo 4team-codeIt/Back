@@ -27,7 +27,7 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
   @Query(
       "SELECT s FROM Social s "
           + "WHERE LOWER(s.name) LIKE LOWER(CONCAT('%', :name, '%')) "
-          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount "
+          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount AND s.canceled IS NULL "
           + "ORDER BY s.createdAt DESC")
   Page<Social> findAllInProgress(
       @Param("name") final String name,
@@ -66,7 +66,7 @@ public interface SocialRepository extends JpaRepository<Social, Long> {
   @Query(
       "SELECT s FROM Social s "
           + "WHERE s.id IN :ids "
-          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount "
+          + "AND s.gatheringDate > :date AND SIZE(s.participants) < s.maxCount AND s.canceled IS NULL "
           + "ORDER BY s.createdAt DESC")
   Page<Social> findPartInProgress(
       @Param("ids") final List<Long> ids,
